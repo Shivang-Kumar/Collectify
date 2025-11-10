@@ -1,6 +1,7 @@
 package edu.tcu.cs.hogwarts_artifacts_online.user;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -77,6 +79,16 @@ public class UserController {
 	public Result deleteUserById(@PathVariable Integer userId) {
 		this.userService.deleteUserById(userId);
 		return new Result(true,StatusCode.SUCCESS,"Delete Success");
+	}
+	
+	@PatchMapping("/{userId}/password")
+	public Result changePassword(@PathVariable Integer userId, @RequestBody Map<String,String> passwordMap)
+	{
+		String oldPassword=passwordMap.get("oldPassword");
+		String newPassword=passwordMap.get("newPassword");
+		String confirmPassword=passwordMap.get("confirmPassword");
+		this.userService.changePassword(userId,oldPassword,newPassword,confirmPassword);
+		return new Result(true,StatusCode.SUCCESS,"Change Password Success", null);
 	}
 
 }
