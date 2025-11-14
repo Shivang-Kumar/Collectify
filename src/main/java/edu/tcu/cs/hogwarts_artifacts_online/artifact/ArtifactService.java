@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -89,5 +91,10 @@ public class ArtifactService {
 		
 
 		return response.getCandidates().get(0).getContent().getParts().get(0).getText();
+	}
+
+	public Page<Artifact> findAll(Pageable pageable) {
+		
+		return this.artifactRepository.findAll(pageable);
 	}
 }

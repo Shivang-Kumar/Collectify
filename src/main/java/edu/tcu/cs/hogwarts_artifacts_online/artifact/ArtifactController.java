@@ -3,6 +3,8 @@ package edu.tcu.cs.hogwarts_artifacts_online.artifact;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -48,13 +50,13 @@ public class ArtifactController {
 	}
 
 	@GetMapping
-	public Result findAllArtifact() {
+	public Result findAllArtifact(Pageable pageable) {
 
-		List<Artifact> foundArtifacts = this.artifactService.findAll();
-		// Convert Found Artifacts to list of ArtifactDtos
-		List<ArtifactDto> artifactDtos = foundArtifacts.stream()
-				.map(foundArtifact -> this.artifactDtoConverter.convert(foundArtifact)).collect(Collectors.toList());
-		return new Result(true, StatusCode.SUCCESS, "Find All Success", artifactDtos);
+		Page<Artifact> foundArtifactsPage = this.artifactService.findAll(pageable);
+		// Convert Found Artifacts to Page of ArtifactDtos
+		Page<ArtifactDto> artifactDtoPage = foundArtifactsPage
+				.map(foundArtifact -> this.artifactDtoConverter.convert(foundArtifact));
+		return new Result(true, StatusCode.SUCCESS, "Find All Success", artifactDtoPage);
 	}
 
 	@PostMapping

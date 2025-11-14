@@ -20,9 +20,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -143,18 +148,23 @@ public class ArtifactControllerTest {
 	@Test
 	void findAllArtifactsSuccess() throws Exception {
 		// Given
-
-		given(this.artifactService.findAll()).willReturn(this.artifacts);
+   Pageable pageable=PageRequest.of(0, 20);
+   PageImpl<Artifact> artifactPage=new PageImpl<>(this.artifacts,pageable,this.artifacts.size());
+		given(this.artifactService.findAll(Mockito.any(Pageable.class))).willReturn(artifactPage);
+		MultiValueMap<String, String> requestParams=new LinkedMultiValueMap<>();
+		requestParams.add("page", "0");
+		requestParams.add("size","20");
+		
 
 		// When and Then
-		this.mockMvc.perform(get(this.baseUrl+"/artifacts").accept(org.springframework.http.MediaType.APPLICATION_JSON))
+		this.mockMvc.perform(get(this.baseUrl+"/artifacts").accept(org.springframework.http.MediaType.APPLICATION_JSON).params(requestParams))
 				.andExpect(jsonPath("$.flag").value(true)).andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
 				.andExpect(jsonPath("$.message").value("Find All Success"))
-				.andExpect(jsonPath("$.data", Matchers.hasSize(this.artifacts.size())))
-				.andExpect(jsonPath("$.data[0].id").value("21232456489892566"))
-				.andExpect(jsonPath("$.data[0].name").value("Deluminator"))
-				.andExpect(jsonPath("$.data[1].id").value("31232456489892567"))
-				.andExpect(jsonPath("$.data[1].name").value("Invisibility Cloak"));
+				.andExpect(jsonPath("$.data.content", Matchers.hasSize(this.artifacts.size())))
+				.andExpect(jsonPath("$.data.content[0].id").value("21232456489892566"))
+				.andExpect(jsonPath("$.data.content[0].name").value("Deluminator"))
+				.andExpect(jsonPath("$.data.content[1].id").value("31232456489892567"))
+				.andExpect(jsonPath("$.data.content[1].name").value("Invisibility Cloak"));
 
 	}
 

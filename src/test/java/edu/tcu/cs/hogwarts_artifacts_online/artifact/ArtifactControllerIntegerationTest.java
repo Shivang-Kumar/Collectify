@@ -70,7 +70,7 @@ public class ArtifactControllerIntegerationTest {
 		.andExpect(jsonPath("$.flag").value(true))
 		.andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
 		.andExpect(jsonPath("$.message").value("Find All Success"))
-		.andExpect(jsonPath("$.data",Matchers.hasSize(6)));
+		.andExpect(jsonPath("$.data.content",Matchers.hasSize(6)));
 	}
 	
 	
@@ -102,7 +102,7 @@ public class ArtifactControllerIntegerationTest {
 				.accept(org.springframework.http.MediaType.APPLICATION_JSON))
 		.andExpect(jsonPath("$.flag").value(true)).andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
 		.andExpect(jsonPath("$.message").value("Find All Success"))
-		.andExpect(jsonPath("$.data", Matchers.hasSize(7)));
+		.andExpect(jsonPath("$.data.content", Matchers.hasSize(7)));
 
 	}
 
