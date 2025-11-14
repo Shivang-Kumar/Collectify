@@ -10,21 +10,25 @@ services:
       - 9090:9090
 
   grafana:
-   image: grafana/grafana-enterprise
-   container_name: grafana
-   ports:
-    - 3000:3000
-   volumes:
-    - ./docker/grafana:/var/lib/grafana  # Persist dashboards and configs
-   env_file:
-    - ./docker/grafana/grafana-config.env  # Load environment variables (if needed)
-    
+    image: grafana/grafana-enterprise
+    container_name: grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - ./docker/grafana:/var/lib/grafana  # Persist dashboards and configs
+    env_file:
+      - ./docker/grafana/grafana-config.env  # Load environment variables (if needed)
+
   zipkin:
     image: openzipkin/zipkin
     container_name: zipkin
     ports:
       - 9411:9411
-    
+
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
 
   mailpit:
     image: axllent/mailpit

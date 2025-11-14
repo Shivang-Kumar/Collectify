@@ -107,11 +107,26 @@ public class ExceptionHandlerAdvice {
 	Result handleAccessDeniedException(AccessDeniedException ex) {
 		return new Result(false, StatusCode.FORBIDDEN, "No permission.", ex.getMessage());
 	}
+	
+	
+	@ExceptionHandler({PasswordChangeIllegalArgumentException.class})
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	public Result handlePasswordChangeIllegalArgumentException(PasswordChangeIllegalArgumentException ex)
+	{
+		return new Result(false,StatusCode.INVALID_ARGUMENT,ex.getMessage());
+	}
+	
+	
+	
 
 	@ExceptionHandler({ Exception.class })
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
 	Result handleOtherException(Exception ex) {
 		return new Result(false, StatusCode.INTERNAL_SERVER_ERROR, "A server internal error occurs.", ex.getMessage());
 	}
+	
+	
+	
+	
 
 }
