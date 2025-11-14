@@ -2,10 +2,12 @@ package edu.tcu.cs.hogwarts_artifacts_online.security;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import edu.tcu.cs.hogwarts_artifacts_online.rediscache.RedisCacheClient;
 import edu.tcu.cs.hogwarts_artifacts_online.user.MyUserPrincipal;
 import edu.tcu.cs.hogwarts_artifacts_online.user.User;
 import edu.tcu.cs.hogwarts_artifacts_online.user.DTO.UserDto;
@@ -18,11 +20,14 @@ public class AuthService {
 	
 	private final UserToUserDtoConverter userToUserDtoConverter;
 	
+	private final RedisCacheClient redisCacheClient;
+	
 
-	public AuthService(JWTProvider jwtProvider) {
+	public AuthService(JWTProvider jwtProvider,RedisCacheClient redisCacheClient) {
 		super();
 		this.jwtProvider = jwtProvider;
 		this.userToUserDtoConverter = new UserToUserDtoConverter();
+		this.redisCacheClient=redisCacheClient;
 	}
 
 	public Map<String,Object> createLoginInfo(Authentication authentication) {
@@ -32,6 +37,12 @@ public class AuthService {
 		UserDto userDto=this.userToUserDtoConverter.convert(user);
 		//Create a JWT
 		String token=this.jwtProvider.createToken(authentication);
+		// Save the token in redis,Key is "whitelist:{userId} and value is the token"
+		this.redisCacheClient.set("whitelist:"+user.getId(), token, 2, TimeUnit.HOURS);
+		
+		
+		
+		
 		Map<String,Object> loginResultMap=new HashMap<>();
 		loginResultMap.put("userInfo",userDto);
 		loginResultMap.put("token", token);

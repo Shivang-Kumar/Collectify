@@ -9,6 +9,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import edu.tcu.cs.hogwarts_artifacts_online.rediscache.RedisCacheClient;
 import edu.tcu.cs.hogwarts_artifacts_online.system.ObjectNotFoundException;
 import edu.tcu.cs.hogwarts_artifacts_online.system.exception.PasswordChangeIllegalArgumentException;
 
@@ -17,14 +18,16 @@ public class UserService implements UserDetailsService {
 	
 	private UserRepository userRepository;
 	private PasswordEncoder passwordEncoder;
+	private RedisCacheClient redisCacheClient;
 
 	
 	
 	
-	public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+	public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,RedisCacheClient redisCacheClient) {
 		super();
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
+		this.redisCacheClient= redisCacheClient;
 	}
 
 
@@ -97,6 +100,12 @@ public class UserService implements UserDetailsService {
 	}
 	
 	hogwartsUser.setPassword(this.passwordEncoder.encode(newPassword));
+	
+	
+	
+	//Revoke users's current jwt token by deleting in redis before saving new password
+	this.redisCacheClient.delete("whitelist:"+userId);
+	
 	this.userRepository.save(hogwartsUser);
 	
 	}

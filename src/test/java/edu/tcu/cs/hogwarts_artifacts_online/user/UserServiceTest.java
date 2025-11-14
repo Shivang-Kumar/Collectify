@@ -24,6 +24,7 @@ import org.springframework.test.context.ActiveProfiles;
 
 import edu.tcu.cs.hogwarts_artifacts_online.Wizard.Wizard;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.Artifact;
+import edu.tcu.cs.hogwarts_artifacts_online.rediscache.RedisCacheClient;
 import edu.tcu.cs.hogwarts_artifacts_online.system.ObjectNotFoundException;
 import edu.tcu.cs.hogwarts_artifacts_online.system.exception.PasswordChangeIllegalArgumentException;
 
@@ -36,6 +37,9 @@ public class UserServiceTest {
 	
 	@Mock
 	PasswordEncoder passwordEncoder;
+	
+	@Mock
+	RedisCacheClient redisCacheClient;
 
 	@InjectMocks
 	UserService userService;
@@ -246,7 +250,7 @@ public class UserServiceTest {
 		given(this.passwordEncoder.matches(anyString(),anyString())).willReturn(true);
 		given(this.passwordEncoder.encode(anyString())).willReturn("encryptedNewPassword");
 		given(this.userRepository.save(hogwartsUser)).willReturn(hogwartsUser);
-		
+		doNothing().when(this.redisCacheClient).delete(anyString());
 		//When 
 		this.userService.changePassword(2, "unencryptedOldPassword", "@1Abcdefg", "@1Abcdefg");
 		
