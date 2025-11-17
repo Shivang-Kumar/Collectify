@@ -32,6 +32,7 @@ public class JWTProvider {
 		.expiresAt(now.plus(expiresIn,ChronoUnit.HOURS))
 		.subject(authentication.getName()).claim("authorities", authorities).build();
 		
+		
 		return this.jwtEncoder.encode(JwtEncoderParameters.from(claims)).getTokenValue();
 	}
 

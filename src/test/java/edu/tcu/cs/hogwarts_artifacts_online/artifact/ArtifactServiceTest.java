@@ -28,6 +28,7 @@ import static org.mockito.Mockito.when;
 import edu.tcu.cs.hogwarts_artifacts_online.Wizard.Wizard;
 import edu.tcu.cs.hogwarts_artifacts_online.Wizard.dto.WizardDto;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.DTO.ArtifactDto;
+import edu.tcu.cs.hogwarts_artifacts_online.artifact.converter.ArtifactToArtifactDtoConverter;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.utils.IdWorker;
 import edu.tcu.cs.hogwarts_artifacts_online.client.ai.chat.ChatClient;
 import edu.tcu.cs.hogwarts_artifacts_online.client.ai.chat.dto.Candidate;
@@ -52,6 +53,9 @@ public class ArtifactServiceTest {
 	
 	@Mock
 	ChatClient chatClient;
+	
+	@Mock
+	ArtifactToArtifactDtoConverter artifactToArtifactDtoConverter;
 	
 	@Mock
 	ObjectMapper objectMapper;
@@ -107,14 +111,14 @@ public class ArtifactServiceTest {
 		// When. Act on the target behavior . When steps should cover the method to be
 		// tested.
 
-		Artifact returnedArtifact = artifactService.findById("13445324535632");
+		ArtifactDto returnedArtifact = artifactService.findById("13445324535632");
 
 		// Then. Assert expected outcomes.
 
-		assertThat(returnedArtifact.getId()).isEqualTo(a.getId());
-		assertThat(returnedArtifact.getName()).isEqualTo(a.getName());
-		assertThat(returnedArtifact.getDescription()).isEqualTo(a.getDescription());
-		assertThat(returnedArtifact.getImageUrl()).isEqualTo(a.getImageUrl());
+		assertThat(returnedArtifact.id()).isEqualTo(a.getId());
+		assertThat(returnedArtifact.name()).isEqualTo(a.getName());
+		assertThat(returnedArtifact.description()).isEqualTo(a.getDescription());
+		assertThat(returnedArtifact.imageUrl()).isEqualTo(a.getImageUrl());
 		verify(artifactRepository, times(1)).findById("13445324535632");
 
 	}
@@ -128,7 +132,7 @@ public class ArtifactServiceTest {
 		// When.
 
 		Throwable thrown = catchThrowable(() -> {
-			Artifact returnedArtifact = artifactService.findById("13445324535632");
+			ArtifactDto returnedArtifact = artifactService.findById("13445324535632");
 		});
 
 		// Then.
@@ -184,23 +188,21 @@ public class ArtifactServiceTest {
 		oldArtifact.setDescription("An invisibility cloack is used to make the wearer invisible");
 		oldArtifact.setImageUrl("ImageUrl");
 
-		Artifact update = new Artifact();
-		//update.setId("13445324535632");
-		update.setName("Invisibility Cloak");
-		update.setDescription("A new Description");
-		update.setImageUrl("ImageUrl");
-
+		ArtifactDto updateArtifactDto = new ArtifactDto("13445324535632","Invisibility Cloak","A new Description","ImageUrl",null);
+	
 		given(artifactRepository.findById("13445324535632")).willReturn(Optional.of(oldArtifact));
 		given(artifactRepository.save(oldArtifact)).willReturn(oldArtifact);
+		given(artifactToArtifactDtoConverter.convert(oldArtifact)).willReturn(updateArtifactDto);
+		
 
 		// When
 
-		Artifact updatedArtifact = artifactService.update("13445324535632", update);
+		ArtifactDto updatedArtifactDto = artifactService.update("13445324535632", updateArtifactDto);
 
 		// Then
 
-		assertThat(updatedArtifact.getId()).isEqualTo("13445324535632");
-		assertThat(updatedArtifact.getDescription()).isEqualTo(update.getDescription());
+		assertThat(updatedArtifactDto.id()).isEqualTo("13445324535632");
+		assertThat(updatedArtifactDto.description()).isEqualTo("A new Description");
 		verify(artifactRepository, times(1)).findById("13445324535632");
 		verify(artifactRepository, times(1)).save(oldArtifact);
 
@@ -209,17 +211,15 @@ public class ArtifactServiceTest {
 	@Test
 	void testUpdateNotFound() {
 		//Given
-		Artifact update = new Artifact();
-		update.setName("Invisibility Cloak");
-		update.setDescription("A new Desription");
-		update.setImageUrl("ImageUrl");
+		ArtifactDto updateArtifactDto = new ArtifactDto("13445324535632","Invisibility Cloak","A new Description","ImageUrl",null);
+
 		
 		given(artifactRepository.findById("13445324535632")).willReturn(Optional.empty());
 
 		
 		//When
 		assertThrows(ObjectNotFoundException.class,()->{
-			artifactService.update("13445324535632",update);
+			artifactService.update("13445324535632",updateArtifactDto);
 		});
 		
 		

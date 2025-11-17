@@ -37,6 +37,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.DTO.ArtifactDto;
+import edu.tcu.cs.hogwarts_artifacts_online.artifact.converter.ArtifactToArtifactDtoConverter;
 import edu.tcu.cs.hogwarts_artifacts_online.system.ObjectNotFoundException;
 import edu.tcu.cs.hogwarts_artifacts_online.system.StatusCode;
 
@@ -50,6 +51,9 @@ public class ArtifactControllerTest {
 
 	@MockBean
 	ArtifactService artifactService;
+	
+	@MockBean
+	ArtifactToArtifactDtoConverter artifactToArtifactDtoConverter;
 
 	@Autowired
 	ObjectMapper objectMapper;
@@ -115,8 +119,9 @@ public class ArtifactControllerTest {
 	@Test
 	void testFindArtifactByIdSuccess() throws Exception {
 		// given
-
-		given(this.artifactService.findById("21232456489892566")).willReturn(this.artifacts.get(0));
+			
+		ArtifactDto returnedDto=this.artifactToArtifactDtoConverter.convert(this.artifacts.get(0));
+		given(this.artifactService.findById("21232456489892566")).willReturn(returnedDto);
 
 		// when and then
 		this.mockMvc
@@ -210,14 +215,12 @@ public class ArtifactControllerTest {
 				"ImageUrl", null);
 
 		String json = this.objectMapper.writeValueAsString(artifactDto);
+		
+		
+		ArtifactDto updatedArtifactDto = new ArtifactDto("13445324535632", "Invisibility Cloak","A new Desription","ImageUrl",null);
 
-		Artifact updatedArtifact = new Artifact();
-		updatedArtifact.setId("13445324535632");
-		updatedArtifact.setName("Invisibility Cloak");
-		updatedArtifact.setDescription("A new Desription");
-		updatedArtifact.setImageUrl("ImageUrl");
-
-		given(this.artifactService.update(eq("13445324535632"),Mockito.any(Artifact.class))).willReturn(updatedArtifact);
+	
+		given(this.artifactService.update(eq("13445324535632"),Mockito.any(ArtifactDto.class))).willReturn(updatedArtifactDto);
 
 		// When and Then
 		this.mockMvc
@@ -226,9 +229,9 @@ public class ArtifactControllerTest {
 				.andExpect(jsonPath("$.flag").value(true)).andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
 				.andExpect(jsonPath("$.message").value("Update Success"))
 				.andExpect(jsonPath("$.data.id").value("13445324535632"))
-				.andExpect(jsonPath("$.data.name").value(updatedArtifact.getName()))
-				.andExpect(jsonPath("$.data.description").value(updatedArtifact.getDescription()))
-				.andExpect(jsonPath("$.data.imageUrl").value(updatedArtifact.getImageUrl()));
+				.andExpect(jsonPath("$.data.name").value(updatedArtifactDto.name()))
+				.andExpect(jsonPath("$.data.description").value(updatedArtifactDto.description()))
+				.andExpect(jsonPath("$.data.imageUrl").value(updatedArtifactDto.imageUrl()));
 		
 	}
 	
@@ -243,7 +246,7 @@ public class ArtifactControllerTest {
 		String json = this.objectMapper.writeValueAsString(artifactDto);
 
 
-		given(this.artifactService.update(eq("13445324535632"),Mockito.any(Artifact.class))).willThrow(new ObjectNotFoundException("artifact","13445324535632"));
+		given(this.artifactService.update(eq("13445324535632"),Mockito.any(ArtifactDto.class))).willThrow(new ObjectNotFoundException("artifact","13445324535632"));
 
 		// When and Then
 		this.mockMvc

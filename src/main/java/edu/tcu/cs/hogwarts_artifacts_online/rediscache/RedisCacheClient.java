@@ -32,8 +32,12 @@ public class RedisCacheClient {
 	
 	public boolean isUserTokenInWhiteList(String userId,String tokenFromRequest)
 	{
-		String tokenFromRedis=get("whitelist"+userId);
-		return tokenFromRedis != null && tokenFromRedis.equals(tokenFromRequest);
+		String tokenFromRedis=get("whitelist:"+userId);
+		boolean ans= tokenFromRedis != null && tokenFromRedis.equals(tokenFromRequest);
+		System.out.println("token in redis "+userId+" and token from request"+tokenFromRequest);
+
+		System.out.println("checking token in redis and request"+ans);
+		return ans;
 	}
 	
 	

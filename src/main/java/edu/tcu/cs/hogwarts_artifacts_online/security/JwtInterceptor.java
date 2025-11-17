@@ -39,7 +39,7 @@ public class JwtInterceptor  implements HandlerInterceptor{
 			Jwt jwt=(Jwt)authentication.getPrincipal();
 			
 			//Retrieve the userId from the JWT claims and check if the token is in the redis whitelist or not
-			String userId=jwt.getClaim("userId").toString();
+			String userId=jwt.getSubject();
 			if(!this.redisCacheClient.isUserTokenInWhiteList(userId, jwt.getTokenValue()))
 			{
 				throw new BadCredentialsException("Invadlid Token");

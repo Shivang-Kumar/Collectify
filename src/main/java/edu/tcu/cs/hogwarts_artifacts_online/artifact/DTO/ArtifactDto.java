@@ -1,5 +1,7 @@
 package edu.tcu.cs.hogwarts_artifacts_online.artifact.DTO;
 
+import java.io.Serializable;
+
 import edu.tcu.cs.hogwarts_artifacts_online.Wizard.dto.WizardDto;
 
 
@@ -18,6 +20,6 @@ public record ArtifactDto(
 		@jakarta.validation.constraints.NotEmpty(message="imageUrl is required")
 		String imageUrl,
 		
-		WizardDto owner) {
+		WizardDto owner) implements Serializable{
 
 }
