@@ -30,6 +30,12 @@ services:
     ports:
       - 6379:6379
 
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: redis-insight
+    ports:
+      - "5540:5540"	
+
   mailpit:
     image: axllent/mailpit
     container_name: mailpit

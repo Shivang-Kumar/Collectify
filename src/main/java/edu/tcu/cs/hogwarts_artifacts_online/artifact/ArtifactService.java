@@ -4,13 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import org.hibernate.Hibernate;
+
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.DTO.ArtifactDto;
+import edu.tcu.cs.hogwarts_artifacts_online.artifact.converter.ArtifactToArtifactDtoConverter;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.utils.IdWorker;
 import edu.tcu.cs.hogwarts_artifacts_online.client.ai.chat.ChatClient;
 import edu.tcu.cs.hogwarts_artifacts_online.client.ai.chat.dto.ChatRequest;
@@ -20,12 +26,14 @@ import edu.tcu.cs.hogwarts_artifacts_online.client.ai.chat.dto.Part;
 import edu.tcu.cs.hogwarts_artifacts_online.system.ObjectNotFoundException;
 import io.micrometer.observation.annotation.Observed;
 import jakarta.transaction.Transactional;
+import jakarta.validation.Valid;
 
 @Service
 @Transactional
 public class ArtifactService {
 
 	private final ArtifactRepository artifactRepository;
+	private final ArtifactToArtifactDtoConverter artifactToArtifactDtoConverter;
 
 	private final ChatClient chatClient;
 
@@ -34,18 +42,23 @@ public class ArtifactService {
 	@Autowired
 	ObjectMapper objectMapper;
 
-	public ArtifactService(ArtifactRepository artifactRepository, IdWorker idWorker, ChatClient chatClient) {
+	public ArtifactService(ArtifactRepository artifactRepository, IdWorker idWorker,ArtifactToArtifactDtoConverter artifactToArtifactDtoConverter, ChatClient chatClient) {
 		super();
 		this.artifactRepository = artifactRepository;
+		this.artifactToArtifactDtoConverter=artifactToArtifactDtoConverter;
 		this.chatClient = chatClient;
 		this.idWorker = idWorker;
 	}
 
 	@Observed(name = "artifact", contextualName = "findByIdService")
-	public Artifact findById(String artifactId) {
-		return this.artifactRepository.findById(artifactId)
+	@Cacheable(value="artifacts",key="#artifactId")
+	public ArtifactDto findById(String artifactId) {
+		Artifact foundArtifact= this.artifactRepository.findById(artifactId)
 				.orElseThrow(() -> new ObjectNotFoundException("artifact", artifactId));
-
+		ArtifactDto foundArtifactDto=this.artifactToArtifactDtoConverter.convert(foundArtifact);
+		
+		
+		return foundArtifactDto;
 	}
 
 	public List<Artifact> findAll() {
@@ -59,13 +72,22 @@ public class ArtifactService {
 
 	}
 
-	public Artifact update(String artifactId, Artifact update) {
+	
+	@Transactional
+	@CachePut(value="artifacts",key="#result.id")
+	public ArtifactDto update(String artifactId, @Valid ArtifactDto updateArtifactDto) {
 
 		return this.artifactRepository.findById(artifactId).map(oldArtifact -> {
-			oldArtifact.setName(update.getName());
-			oldArtifact.setDescription(update.getDescription());
-			oldArtifact.setImageUrl(update.getImageUrl());
-			return this.artifactRepository.save(oldArtifact);
+			oldArtifact.setName(updateArtifactDto.name());
+			oldArtifact.setDescription(updateArtifactDto.description());
+			oldArtifact.setImageUrl(updateArtifactDto.imageUrl());
+			//forcing artifact to load wizard also so that cache has complete object
+		   oldArtifact.getOwner();
+		   this.artifactRepository.save(oldArtifact);
+		   
+		   ArtifactDto oldArtifactDto=this.artifactToArtifactDtoConverter.convert(oldArtifact);
+		   return oldArtifactDto;
+		  
 
 		}).orElseThrow(() -> new ObjectNotFoundException("artifact", artifactId));
 

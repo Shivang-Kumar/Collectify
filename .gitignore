@@ -42,3 +42,4 @@ docker/grafana/plugins/grafana-metricsdrilldown-app/
 docker/grafana/plugins/grafana-pyroscope-app/*.js
 docker/grafana/plugins/grafana-pyroscope-app/*.js.map
 docker/grafana/plugins/grafana-pyroscope-app/*.LICENSE.txt
+docker/grafana/grafana.db

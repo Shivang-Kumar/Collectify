@@ -38,7 +38,7 @@ public class AuthService {
 		//Create a JWT
 		String token=this.jwtProvider.createToken(authentication);
 		// Save the token in redis,Key is "whitelist:{userId} and value is the token"
-		this.redisCacheClient.set("whitelist:"+user.getId(), token, 2, TimeUnit.HOURS);
+		this.redisCacheClient.set("whitelist:"+user.getUsername(), token, 2, TimeUnit.HOURS);
 		
 		
 		

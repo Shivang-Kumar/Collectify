@@ -43,10 +43,9 @@ public class ArtifactController {
 
 	@GetMapping("/{artifactId}")
 	public Result findArtifactById(@PathVariable String artifactId) {
-		Artifact foundArtifact = this.artifactService.findById(artifactId);
+		ArtifactDto foundArtifactDto = this.artifactService.findById(artifactId);
 		meterRegistry.counter("artifacd.id."+artifactId).increment();
-		ArtifactDto artifactDto = this.artifactDtoConverter.convert(foundArtifact);
-		return new Result(true, StatusCode.SUCCESS, "Find one Success", artifactDto);
+		return new Result(true, StatusCode.SUCCESS, "Find one Success", foundArtifactDto);
 	}
 
 	@GetMapping
@@ -68,13 +67,10 @@ public class ArtifactController {
 	}
 	
 	@PutMapping("/{artifactId}")
-	public Result updateArtifact( @PathVariable  String artifactId,@Valid @RequestBody ArtifactDto artifactDto) {
-		Artifact update=this.artifactDtoToArtifactConverter.convert(artifactDto);
-		Artifact updatedArtifact=this.artifactService.update(artifactId, update);
-		ArtifactDto updatedArtifactDto=this.artifactDtoConverter.convert(updatedArtifact);
-		return new Result(true,StatusCode.SUCCESS,"Update Success",updatedArtifactDto);
+	public Result updateArtifact( @PathVariable  String artifactId,@Valid @RequestBody ArtifactDto updateArtifactDto) {
 		
-		
+		ArtifactDto updatedArtifactDto=this.artifactService.update(artifactId, updateArtifactDto);
+		return new Result(true,StatusCode.SUCCESS,"Update Success",updatedArtifactDto);		
 	}
 	
 	
