@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
@@ -25,8 +26,12 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import org.testcontainers.junit.jupiter.Container;
+import org.testcontainers.junit.jupiter.Testcontainers;
+import org.testcontainers.utility.DockerImageName;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.redis.testcontainers.RedisContainer;
 
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.DTO.ArtifactDto;
 import edu.tcu.cs.hogwarts_artifacts_online.system.StatusCode;
@@ -36,6 +41,7 @@ import edu.tcu.cs.hogwarts_artifacts_online.system.StatusCode;
 @DisplayName("Integration test for Artifact API endpoints")
 @Tag("integration")
 @ActiveProfiles(value="dev")
+@Testcontainers
 public class ArtifactControllerIntegerationTest {
 
 	@Autowired
@@ -48,6 +54,11 @@ public class ArtifactControllerIntegerationTest {
 	String baseUrl;
 	
 	String token;
+	
+	@Container
+	@ServiceConnection
+	static RedisContainer redisContainer = new RedisContainer(DockerImageName.parse("redis:6.2.6"));
+
 	
 	@BeforeEach
 	void setUp() throws Exception {
@@ -79,13 +90,9 @@ public class ArtifactControllerIntegerationTest {
 	void testAddArtifactSuccess() throws Exception {
 		
 
-		Artifact newArtifact = new Artifact();
+		ArtifactDto newArtifact = new ArtifactDto("21135465456489800","Remembrall","Remembrall is a small glass ball filled with smoke that turns red when the user has forgotten something","Image URL.....",null);
 
-		newArtifact.setId("21135465456489800");
-		newArtifact.setName("Remembrall");
-		newArtifact.setDescription(
-				"Remembrall is a small glass ball filled with smoke that turns red when the user has forgotten something");
-		newArtifact.setImageUrl("Image URL.....");
+		
 		
 		String json = this.objectMapper.writeValueAsString(newArtifact);
 
@@ -94,9 +101,9 @@ public class ArtifactControllerIntegerationTest {
 						.accept(org.springframework.http.MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.flag").value(true)).andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
 				.andExpect(jsonPath("$.message").value("Add Success")).andExpect(jsonPath("$.data.id").isNotEmpty())
-				.andExpect(jsonPath("$.data.name").value(newArtifact.getName()))
-				.andExpect(jsonPath("$.data.description").value(newArtifact.getDescription()))
-				.andExpect(jsonPath("$.data.imageUrl").value(newArtifact.getImageUrl()));
+				.andExpect(jsonPath("$.data.name").value(newArtifact.name()))
+				.andExpect(jsonPath("$.data.description").value(newArtifact.description()))
+				.andExpect(jsonPath("$.data.imageUrl").value(newArtifact.imageUrl()));
 		this.mockMvc
 		.perform(get(this.baseUrl+"/artifacts").contentType(MediaType.APPLICATION_JSON).content(json)
 				.accept(org.springframework.http.MediaType.APPLICATION_JSON))

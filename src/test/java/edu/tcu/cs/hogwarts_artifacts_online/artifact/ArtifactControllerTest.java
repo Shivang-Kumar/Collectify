@@ -120,8 +120,16 @@ public class ArtifactControllerTest {
 	void testFindArtifactByIdSuccess() throws Exception {
 		// given
 			
-		ArtifactDto returnedDto=this.artifactToArtifactDtoConverter.convert(this.artifacts.get(0));
-		given(this.artifactService.findById("21232456489892566")).willReturn(returnedDto);
+		ArtifactDto artifactDto = new ArtifactDto(
+			    "21232456489892566",
+			    "Deluminator",
+			    "A deluminator is a device invented by Albus Dumbledore",
+			    "ImageUrl",
+			    null
+			);
+
+			given(this.artifactService.findById("21232456489892566")).willReturn(artifactDto);
+
 
 		// when and then
 		this.mockMvc
