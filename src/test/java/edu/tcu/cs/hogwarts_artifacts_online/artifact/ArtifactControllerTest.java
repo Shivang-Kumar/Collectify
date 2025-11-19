@@ -120,8 +120,16 @@ public class ArtifactControllerTest {
 	void testFindArtifactByIdSuccess() throws Exception {
 		// given
 			
-		ArtifactDto returnedDto=this.artifactToArtifactDtoConverter.convert(this.artifacts.get(0));
-		given(this.artifactService.findById("21232456489892566")).willReturn(returnedDto);
+		ArtifactDto artifactDto = new ArtifactDto(
+			    "21232456489892566",
+			    "Deluminator",
+			    "A deluminator is a device invented by Albus Dumbledore",
+			    "ImageUrl",
+			    null
+			);
+
+			given(this.artifactService.findById("21232456489892566")).willReturn(artifactDto);
+
 
 		// when and then
 		this.mockMvc
@@ -156,7 +164,19 @@ public class ArtifactControllerTest {
    Pageable pageable=PageRequest.of(0, 20);
    PageImpl<Artifact> artifactPage=new PageImpl<>(this.artifacts,pageable,this.artifacts.size());
 		given(this.artifactService.findAll(Mockito.any(Pageable.class))).willReturn(artifactPage);
-		MultiValueMap<String, String> requestParams=new LinkedMultiValueMap<>();
+		
+		 // Mock DTO converter for each Artifact
+	    for (Artifact a : artifacts) {
+	        given(this.artifactToArtifactDtoConverter.convert(a))
+	                .willReturn(new ArtifactDto(
+	                        a.getId(),
+	                        a.getName(),
+	                        a.getDescription(),
+	                        a.getImageUrl(),
+	                        null
+	                ));
+	    }
+				MultiValueMap<String, String> requestParams=new LinkedMultiValueMap<>();
 		requestParams.add("page", "0");
 		requestParams.add("size","20");
 		
@@ -176,21 +196,28 @@ public class ArtifactControllerTest {
 	@Test
 	void testAddArtifactSuccess() throws Exception {
 		// Given
-		ArtifactDto artifactDto = new ArtifactDto(null, "Rembrall",
-				"Remembrall is a small glass ball filled with smoke that turns red when the user has forgotten something",
-				"ImageUrl", null);
+		ArtifactDto savedArtifactDto = new ArtifactDto(
+			    "21135465456489800",
+			    "Rembrall",
+			    "Rembrall is a small glass ball filled with smoke that turns red when the user has forgotten something",
+			    "Image URL.....",
+			    null
+			);
 
-		String json = this.objectMapper.writeValueAsString(artifactDto);
+		String json = this.objectMapper.writeValueAsString(savedArtifactDto);
 
 		Artifact savedArtifact = new Artifact();
 
 		savedArtifact.setId("21135465456489800");
-		savedArtifact.setName("Remembrall");
+		savedArtifact.setName("Rembrall");
 		savedArtifact.setDescription(
-				"Remembrall is a small glass ball filled with smoke that turns red when the user has forgotten something");
+				"Rembrall is a small glass ball filled with smoke that turns red when the user has forgotten something");
 		savedArtifact.setImageUrl("Image URL.....");
 
-		given(this.artifactService.save(Mockito.any(Artifact.class))).willReturn(savedArtifact);
+	
+
+			given(this.artifactService.save(Mockito.any(Artifact.class))).willReturn(savedArtifact);
+			given(this.artifactToArtifactDtoConverter.convert(savedArtifact)).willReturn(savedArtifactDto);
 
 		// When and Then
 		this.mockMvc

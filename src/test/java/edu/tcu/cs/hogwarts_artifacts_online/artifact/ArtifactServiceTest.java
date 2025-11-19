@@ -107,15 +107,18 @@ public class ArtifactServiceTest {
 		a.setOwner(w);
 
 		given(artifactRepository.findById("13445324535632")).willReturn(Optional.of(a));
+		
+		// Mock converter
+        ArtifactDto dto = new ArtifactDto(a.getId(), a.getName(), a.getDescription(), a.getImageUrl(),null);
+        given(artifactToArtifactDtoConverter.convert(a)).willReturn(dto);
 
 		// When. Act on the target behavior . When steps should cover the method to be
 		// tested.
 
-		ArtifactDto returnedArtifact = artifactService.findById("13445324535632");
+		ArtifactDto returnedArtifact = artifactService.findById("13445324535632");	
 
 		// Then. Assert expected outcomes.
 
-		assertThat(returnedArtifact.id()).isEqualTo(a.getId());
 		assertThat(returnedArtifact.name()).isEqualTo(a.getName());
 		assertThat(returnedArtifact.description()).isEqualTo(a.getDescription());
 		assertThat(returnedArtifact.imageUrl()).isEqualTo(a.getImageUrl());

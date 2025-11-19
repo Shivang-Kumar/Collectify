@@ -79,7 +79,7 @@ public class ArtifactController {
 	{  this.artifactService.delete(artifactId);
 		return new Result(true,StatusCode.SUCCESS,"Delete Success");
 	}
-	
+	 
 	
 	@GetMapping("/summary")
     public Result summarizeArtifact() throws Exception {
