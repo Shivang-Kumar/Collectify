@@ -1,12 +1,17 @@
 package edu.tcu.cs.hogwarts_artifacts_online.Wizard;
 
 import java.util.List;
+import java.util.Set;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.Artifact;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.ArtifactRepository;
+import edu.tcu.cs.hogwarts_artifacts_online.artifact.utils.CommonUtils;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.utils.IdWorker;
+import edu.tcu.cs.hogwarts_artifacts_online.rediscache.RedisLeaderboardCacheClient;
 import edu.tcu.cs.hogwarts_artifacts_online.system.ObjectNotFoundException;
 
 @Service
@@ -15,12 +20,14 @@ public class WizardService {
 	private final WizardRepository wizardRepository;
 	private final IdWorker idWorker;
 	private final ArtifactRepository artifactRepository;
+	private final RedisLeaderboardCacheClient leaderboardCacheClient;
 
-	public WizardService(WizardRepository wizardRepository, IdWorker idWorker, ArtifactRepository artifactRepository) {
+	public WizardService(WizardRepository wizardRepository, IdWorker idWorker, ArtifactRepository artifactRepository,RedisLeaderboardCacheClient redisLeaderboardCacheClient) {
 		super();
 		this.wizardRepository = wizardRepository;
 		this.idWorker = idWorker;
 		this.artifactRepository = artifactRepository;
+		this.leaderboardCacheClient=redisLeaderboardCacheClient;
 	}
 
 	public List<Wizard> findAll() {
@@ -88,5 +95,25 @@ public class WizardService {
 		
 		
 	}
+
+	public Set<ZSetOperations.TypedTuple<String>> getLeaderboard(String entityType, String property, int limit) {
+	
+		boolean checkedKey=this.leaderboardCacheClient.hasKey(entityType, property);
+		if(!checkedKey)
+		{
+			//check in the database and set the cache
+			Sort sort=Sort.by(property).descending();
+			List<Wizard> sortedWizards=this.wizardRepository.findAll(sort);
+			sortedWizards.stream().forEach(wizard -> {
+				double score=CommonUtils.getScoreOfProperty(wizard, property);
+				this.leaderboardCacheClient.setScore(entityType, property, wizard.getName(),score);
+			});
+		}
+	
+			return this.leaderboardCacheClient.getTop(entityType, property, limit);		
+	}
+	
+	
+
 
 }

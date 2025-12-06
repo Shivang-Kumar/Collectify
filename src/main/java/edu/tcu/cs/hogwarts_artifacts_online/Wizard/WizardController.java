@@ -1,8 +1,10 @@
 package edu.tcu.cs.hogwarts_artifacts_online.Wizard;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -10,6 +12,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.tcu.cs.hogwarts_artifacts_online.Wizard.converter.WizardDtoToWizardConverter;
@@ -78,4 +81,15 @@ public class WizardController {
 		this.wizardService.assignArtifact(wizardId, artifactId);
 		return new Result(true,StatusCode.SUCCESS,"Artifact Assignment Success");
 	}
+	
+	
+	//Leaderboard controller
+	@GetMapping("/leaderboard")
+	public Result getLeaderboard(@RequestParam(defaultValue="artifacts") String property, @RequestParam(defaultValue="10") int limit)
+	{
+		Set<ZSetOperations.TypedTuple<String>> ans=this.wizardService.getLeaderboard("wizards",property,limit);
+		return new Result(true,StatusCode.SUCCESS,"Wizard Leaderboard",ans);
+	
+	}
+	
 }
