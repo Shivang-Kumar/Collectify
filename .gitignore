@@ -34,6 +34,7 @@ build/
 
 ### Grafana plugin build outputs ###
 docker/grafana/plugins/grafana-lokiexplore-app/*.js
+docker/grafana/plugins/grafana-lokiexplore-app/*.svg
 docker/grafana/plugins/grafana-lokiexplore-app/*.js.map
 docker/grafana/plugins/grafana-lokiexplore-app/*.LICENSE.txt
 docker/grafana/plugins/grafana-lokiexplore-app/img/
