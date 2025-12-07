@@ -106,7 +106,7 @@ public class WizardService {
 			List<Wizard> sortedWizards=this.wizardRepository.findAll(sort);
 			sortedWizards.stream().forEach(wizard -> {
 				double score=CommonUtils.getScoreOfProperty(wizard, property);
-				this.leaderboardCacheClient.setScore(entityType, property, wizard.getName(),score);
+				this.leaderboardCacheClient.setScore(entityType, property, wizard.getId()+"",score);
 			});
 		}
 	
