@@ -84,10 +84,11 @@ public class WizardController {
 	
 	
 	//Leaderboard controller
-	@GetMapping("/leaderboard")
-	public Result getLeaderboard(@RequestParam(defaultValue="artifacts") String property, @RequestParam(defaultValue="10") int limit)
+	
+	@GetMapping("/leaderboard/artifacts")
+	public Result getLeaderboard(@RequestParam(defaultValue="10") int limit)
 	{
-		Set<ZSetOperations.TypedTuple<String>> ans=this.wizardService.getLeaderboard("wizards",property,limit);
+		List<Object> ans=this.wizardService.getLeaderboard("wizards","artifacts",limit);
 		return new Result(true,StatusCode.SUCCESS,"Wizard Leaderboard",ans);
 	
 	}

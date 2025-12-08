@@ -2,6 +2,8 @@ package edu.tcu.cs.hogwarts_artifacts_online.Wizard;
 
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.ZSetOperations;
@@ -96,7 +98,7 @@ public class WizardService {
 		
 	}
 
-	public Set<ZSetOperations.TypedTuple<String>> getLeaderboard(String entityType, String property, int limit) {
+	public List<Object> getLeaderboard(String entityType, String property, int limit) {
 	
 		boolean checkedKey=this.leaderboardCacheClient.hasKey(entityType, property);
 		if(!checkedKey)
@@ -106,11 +108,15 @@ public class WizardService {
 			List<Wizard> sortedWizards=this.wizardRepository.findAll(sort);
 			sortedWizards.stream().forEach(wizard -> {
 				double score=CommonUtils.getScoreOfProperty(wizard, property);
+				this.leaderboardCacheClient.saveEntityOfLeaderBoard(entityType, wizard.getId()+"", wizard);
 				this.leaderboardCacheClient.setScore(entityType, property, wizard.getId()+"",score);
 			});
 		}
 	
-			return this.leaderboardCacheClient.getTop(entityType, property, limit);		
+		Set<ZSetOperations.TypedTuple<String>> ans= this.leaderboardCacheClient.getTop(entityType, property, limit);
+		return ans.stream().map(tuple ->
+		   leaderboardCacheClient.getEntityOfLeaderboard(entityType,tuple.getValue()+"")
+		).collect(Collectors.toList());
 	}
 	
 	
