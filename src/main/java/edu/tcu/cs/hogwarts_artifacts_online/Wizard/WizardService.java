@@ -9,6 +9,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.redis.core.ZSetOperations;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import edu.tcu.cs.hogwarts_artifacts_online.Wizard.converter.WizardToWizardDtoConverter;
+import edu.tcu.cs.hogwarts_artifacts_online.Wizard.dto.WizardDto;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.Artifact;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.ArtifactRepository;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.utils.CommonUtils;
@@ -23,13 +28,15 @@ public class WizardService {
 	private final IdWorker idWorker;
 	private final ArtifactRepository artifactRepository;
 	private final RedisLeaderboardCacheClient leaderboardCacheClient;
+	private final WizardToWizardDtoConverter wizardToWizardDtoConverter;
 
-	public WizardService(WizardRepository wizardRepository, IdWorker idWorker, ArtifactRepository artifactRepository,RedisLeaderboardCacheClient redisLeaderboardCacheClient) {
+	public WizardService(WizardRepository wizardRepository, IdWorker idWorker, ArtifactRepository artifactRepository,RedisLeaderboardCacheClient redisLeaderboardCacheClient,WizardToWizardDtoConverter wizardToWizardDtoConverter) {
 		super();
 		this.wizardRepository = wizardRepository;
 		this.idWorker = idWorker;
 		this.artifactRepository = artifactRepository;
 		this.leaderboardCacheClient=redisLeaderboardCacheClient;
+		this.wizardToWizardDtoConverter=wizardToWizardDtoConverter;
 	}
 
 	public List<Wizard> findAll() {
@@ -99,23 +106,36 @@ public class WizardService {
 	}
 
 	public List<Object> getLeaderboard(String entityType, String property, int limit) {
-	
+		System.out.println("Reached get Leaderboard-------------------just reached");
+
 		boolean checkedKey=this.leaderboardCacheClient.hasKey(entityType, property);
 		if(!checkedKey)
 		{
+			System.out.println("Reached get Leaderboard--------------------if condition");
 			//check in the database and set the cache
 			Sort sort=Sort.by(property).descending();
 			List<Wizard> sortedWizards=this.wizardRepository.findAll(sort);
 			sortedWizards.stream().forEach(wizard -> {
 				double score=CommonUtils.getScoreOfProperty(wizard, property);
-				this.leaderboardCacheClient.saveEntityOfLeaderBoard(entityType, wizard.getId()+"", wizard);
+				try {
+					this.leaderboardCacheClient.saveEntityOfLeaderBoard(entityType, wizard.getId()+"", new ObjectMapper().writeValueAsString(this.wizardToWizardDtoConverter.convert(wizard)));
+				} catch (JsonProcessingException e) {
+					e.printStackTrace();
+				}
 				this.leaderboardCacheClient.setScore(entityType, property, wizard.getId()+"",score);
 			});
 		}
 	
 		Set<ZSetOperations.TypedTuple<String>> ans= this.leaderboardCacheClient.getTop(entityType, property, limit);
 		return ans.stream().map(tuple ->
-		   leaderboardCacheClient.getEntityOfLeaderboard(entityType,tuple.getValue()+"")
+		{
+			 String json = (String) leaderboardCacheClient.getEntityOfLeaderboard(entityType, tuple.getValue());
+		        try {
+		            return new ObjectMapper().readValue(json, WizardDto.class);
+		        } catch (JsonProcessingException e) {
+		            throw new RuntimeException(e);
+		        }
+		}
 		).collect(Collectors.toList());
 	}
 	
