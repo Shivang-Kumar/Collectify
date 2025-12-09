@@ -54,8 +54,9 @@ public class RedisLeaderboardCacheClient {
 	
 
 	//For storing entity in redis set for efficient leaderboard fetching
-	public void saveEntityOfLeaderBoard(String entityType,String entityId,Object obj) 
+	public void saveEntityOfLeaderBoard(String entityType,String entityId,String obj) 
 	{
+		System.out.println("Reached here! saveEntityOfLeaderboard-=======-=-=-=-=-=-=-=-=-=-=");
 		redisTemplate.opsForHash().put(getEntityKey(entityType), entityId,obj);
 	}
 

@@ -84,7 +84,6 @@ public class WizardController {
 	
 	
 	//Leaderboard controller
-	
 	@GetMapping("/leaderboard/artifacts")
 	public Result getLeaderboard(@RequestParam(defaultValue="10") int limit)
 	{

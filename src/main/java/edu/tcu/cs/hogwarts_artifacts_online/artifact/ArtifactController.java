@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.DTO.ArtifactDto;
@@ -89,5 +90,14 @@ public class ArtifactController {
 		String artifactSummary=this.artifactService.summarize(artifactDtos);
 	     return new Result(true,StatusCode.SUCCESS,"Summarize Success",artifactSummary);
 	}
+	
+//		Artifact Leaderboard controller we can pass any property later on 
+//		@GetMapping("/leaderboard/{property}")
+//		public Result getLeaderboard(@PathVariable property,@RequestParam(defaultValue="10") int limit)
+//		{
+//			List<Object> ans=this.artifactService.getLeaderboard("artifacts",property,limit);
+//			return new Result(true,StatusCode.SUCCESS,"Artifact Leaderboard",ans);
+//		
+//		}
 
 }
