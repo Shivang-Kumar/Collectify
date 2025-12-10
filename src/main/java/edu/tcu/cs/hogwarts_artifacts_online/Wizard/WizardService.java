@@ -138,6 +138,10 @@ public class WizardService {
 		}
 		).collect(Collectors.toList());
 	}
+
+	public long getWizardRank(String entityType, String property, String wizardId) {
+		return this.leaderboardCacheClient.getEntityRank(entityType, property, wizardId);
+	}
 	
 	
 

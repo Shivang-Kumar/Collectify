@@ -84,10 +84,18 @@ public class WizardController {
 	
 	
 	//Leaderboard controller
-	@GetMapping("/leaderboard/artifacts")
+	@GetMapping("/leaderboard/wizards")
 	public Result getLeaderboard(@RequestParam(defaultValue="10") int limit)
 	{
 		List<Object> ans=this.wizardService.getLeaderboard("wizards","artifacts",limit);
+		return new Result(true,StatusCode.SUCCESS,"Wizard Leaderboard",ans);
+	
+	}
+	
+	@GetMapping("/leaderboard/wizards/{wizardId}")
+	public Result getLeaderboard(@PathVariable String wizardId)
+	{
+		long ans=this.wizardService.getWizardRank("wizards","artifacts",wizardId)+1;
 		return new Result(true,StatusCode.SUCCESS,"Wizard Leaderboard",ans);
 	
 	}
