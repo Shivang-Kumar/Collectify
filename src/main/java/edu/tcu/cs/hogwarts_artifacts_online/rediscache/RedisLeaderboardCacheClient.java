@@ -66,8 +66,12 @@ public class RedisLeaderboardCacheClient {
 	}
 	
 	
-	
-	
+	public long getEntityRank(String entityType,String property,String id)
+	{
+		return this.redisTemplate.opsForZSet().rank(getLeaderboardKey(entityType, property), id);
+	}
+
+
 	
 	
 
