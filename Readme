@@ -1,0 +1,34 @@
+# 🏠 Spring Boot Project
+
+A **Spring Boot** application designed to provide a robust starting point for building Java-based backend services. This project follows standard Spring Boot architecture and encourages modular, clean, and maintainable code.
+
+---
+
+## 🚀 Features
+
+- RESTful API built with **Spring Boot**
+- **Dependency Injection** with Spring Framework  
+- **Spring Data JPA** for database persistence  
+- **Global Exception Handling**  
+- **DTOs & Mappers** (optional)  
+- **Environment-based configuration** (application.properties / application.yml)  
+- **Unit & Integration Tests** with JUnit & Mockito  
+- Optional: Spring Security, Swagger/OpenAPI, Docker support
+
+---
+
+## 📦 Tech Stack
+
+| Technology        | Purpose |
+|------------------|---------|
+| Java 17+         | Programming language |
+| Spring Boot      | Backend framework |
+| Maven/Gradle     | Build tool |
+| Spring Data JPA  | ORM / Database |
+| H2/PostgreSQL/MySQL | Database (configurable) |
+| Lombok (optional) | Reduce boilerplate |
+| Swagger/OpenAPI (optional) | API documentation |
+
+---
+
+## 📁 Project Structure
