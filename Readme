@@ -32,3 +32,33 @@ A **Spring Boot** application designed to provide a robust starting point for bu
 ---
 
 ## 📁 Project Structure
+src/
+ └── main/
+     ├── java/
+     │   └── com.example.project/
+     │       ├── config/
+     │       ├── controller/
+     │       ├── service/
+     │       ├── service/impl/
+     │       ├── repository/
+     │       ├── model/
+     │       ├── dto/
+     │       ├── mapper/
+     │       ├── exception/
+     │       ├── security/
+     │       └── ProjectApplication
+     │
+     └── resources/
+         ├── application.yml
+         ├── application-dev.yml
+         ├── application-prod.yml
+         ├── static/
+         └── templates/
+
+ └── test/
+     └── java/
+         └── com.example.project/
+             ├── controller/
+             ├── service/
+             └── repository/
+
