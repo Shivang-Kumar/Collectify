@@ -33,14 +33,4 @@ build/
 .vscode/
 
 ### Grafana plugin build outputs ###
-docker/grafana/plugins/grafana-lokiexplore-app/*.js
-docker/grafana/plugins/grafana-lokiexplore-app/*.svg
-docker/grafana/plugins/grafana-lokiexplore-app/*.js.map
-docker/grafana/plugins/grafana-lokiexplore-app/*.LICENSE.txt
-docker/grafana/plugins/grafana-lokiexplore-app/img/
-docker/grafana/plugins/grafana-exploretraces-app/
-docker/grafana/plugins/grafana-metricsdrilldown-app/
-docker/grafana/plugins/grafana-pyroscope-app/*.js
-docker/grafana/plugins/grafana-pyroscope-app/*.js.map
-docker/grafana/plugins/grafana-pyroscope-app/*.LICENSE.txt
-docker/grafana/grafana.db
+docker/grafana/
