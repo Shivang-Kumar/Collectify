@@ -76,7 +76,13 @@ public class SecurityConfiguration {
 						.requestMatchers(HttpMethod.DELETE, this.baseUrl + "/users/**").hasAuthority("ROLE_admin")
 						.requestMatchers(EndpointRequest.to("health","info","prometheus")).permitAll()
 						.requestMatchers(EndpointRequest.toAnyEndpoint().excluding("health","info")).hasAnyAuthority("ROLE_admin")
-						.requestMatchers(AntPathRequestMatcher.antMatcher("/h2-console/**")).permitAll()
+						.requestMatchers(
+							    "/h2-console/**",
+							    "/swagger-ui.html",
+							    "/swagger-ui/**",
+							    "/v3/api-docs/**"
+							).permitAll()
+
 						// All other request is to be authenticated
 						.anyRequest().authenticated())
 				.headers(headers -> headers.frameOptions().disable()).csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults())

@@ -16,16 +16,26 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+
+
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.DTO.ArtifactDto;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.converter.ArtifactDtoToArtifactConverter;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.converter.ArtifactToArtifactDtoConverter;
 import edu.tcu.cs.hogwarts_artifacts_online.system.Result;
 import edu.tcu.cs.hogwarts_artifacts_online.system.StatusCode;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("${api.endpoint.base-url}/artifacts")
+@Tag(name = "Artifact Management", description = "Operations related to Hogwarts artifacts")
 public class ArtifactController {
 
 	private final ArtifactService artifactService;
@@ -42,7 +52,18 @@ public class ArtifactController {
 		this.meterRegistry = meterRegistry;
 	}
 
-	@GetMapping("/{artifactId}")
+	
+	 @GetMapping("/{artifactId}")
+	    @Operation(
+	        summary = "Get artifact by ID",
+	        description = "Retrieve a single artifact using its unique ID"
+	    )
+	    @ApiResponses({
+	        @ApiResponse(responseCode = "200", description = "Artifact found",
+	            content = @Content(schema = @Schema(implementation = Result.class))),
+	        @ApiResponse(responseCode = "404", description = "Artifact not found"),
+	        @ApiResponse(responseCode = "500", description = "Server error")
+	    })
 	public Result findArtifactById(@PathVariable String artifactId) {
 		ArtifactDto foundArtifactDto = this.artifactService.findById(artifactId);
 		meterRegistry.counter("artifacd.id."+artifactId).increment();
@@ -50,6 +71,7 @@ public class ArtifactController {
 	}
 
 	@GetMapping
+    @Operation(summary = "Get all artifacts", description = "Retrieve artifacts with pagination")
 	public Result findAllArtifact(Pageable pageable) {
 
 		Page<Artifact> foundArtifactsPage = this.artifactService.findAll(pageable);
@@ -60,6 +82,7 @@ public class ArtifactController {
 	}
 
 	@PostMapping
+    @Operation(summary = "Update an artifact")
 	public Result addArtifact(@Valid   @RequestBody ArtifactDto artifactDto) {
 		Artifact newArtifact = this.artifactDtoToArtifactConverter.convert(artifactDto);
 		Artifact savedArtifact = this.artifactService.save(newArtifact);
@@ -68,7 +91,8 @@ public class ArtifactController {
 	}
 	
 	@PutMapping("/{artifactId}")
-	public Result updateArtifact( @PathVariable  String artifactId,@Valid @RequestBody ArtifactDto updateArtifactDto) {
+	public Result updateArtifact(@Parameter(description = "Artifact data", required = true)
+			@PathVariable  String artifactId,@Valid @RequestBody ArtifactDto updateArtifactDto) {
 		
 		ArtifactDto updatedArtifactDto=this.artifactService.update(artifactId, updateArtifactDto);
 		return new Result(true,StatusCode.SUCCESS,"Update Success",updatedArtifactDto);		
@@ -83,6 +107,7 @@ public class ArtifactController {
 	 
 	
 	@GetMapping("/summary")
+    @Operation(summary = "Summarize artifacts")
     public Result summarizeArtifact() throws Exception {
 		List<Artifact> foundArtifacts=this.artifactService.findAll();
 		
