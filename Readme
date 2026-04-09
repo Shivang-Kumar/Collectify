@@ -2,7 +2,6 @@ Spring Boot Project
 
 A Spring Boot application designed to provide a robust starting point for building Java-based backend services. This project follows standard Spring Boot architecture and encourages modular, clean, and maintainable code.
 
----
 
  Features
 
@@ -13,7 +12,7 @@ A Spring Boot application designed to provide a robust starting point for buildi
 - DTOs & Mappers (optional)  
 - Environment-based configuration (application.properties / application.yml)  
 - Unit & Integration Tests with JUnit & Mockito  
-- Optional: Spring Security, Swagger/OpenAPI, Docker support
+- Spring Security, Swagger/OpenAPI, Docker Integration
 
 ---
  Tech Stack
