@@ -4,8 +4,8 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import edu.tcu.cs.hogwarts_artifacts_online.Wizard.Wizard;
-import edu.tcu.cs.hogwarts_artifacts_online.Wizard.WizardRepository;
+import edu.tcu.cs.hogwarts_artifacts_online.Owner.Owner;
+import edu.tcu.cs.hogwarts_artifacts_online.Owner.OwnerRepository;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.Artifact;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.ArtifactRepository;
 import edu.tcu.cs.hogwarts_artifacts_online.user.User;
@@ -19,7 +19,7 @@ public class DbDataInitializer implements CommandLineRunner {
 	
 	private final ArtifactRepository artifactRepository;
 	
-	private final WizardRepository wizardRepository; 
+	private final OwnerRepository wizardRepository; 
 	
 	private final UserService userService;
 	
@@ -28,7 +28,7 @@ public class DbDataInitializer implements CommandLineRunner {
 
 
 
-	public DbDataInitializer(ArtifactRepository artifactRepository, WizardRepository wizardRepository,
+	public DbDataInitializer(ArtifactRepository artifactRepository, OwnerRepository wizardRepository,
 			UserService userService) {
 		super();
 		this.artifactRepository = artifactRepository;
@@ -80,21 +80,21 @@ public class DbDataInitializer implements CommandLineRunner {
 		a6.setDescription("The Marauder's Map shows every inch of Hogwarts and the location of everyone in it.");
 		a6.setImageUrl("ImageUrl");
 
-		Wizard w1 = new Wizard();
+		Owner w1 = new Owner();
 		w1.setId(1);
 		w1.setName("Albus Dumbledore");
 		w1.addArtifact(a1);
 		w1.addArtifact(a3);
 
 
-		Wizard w2 = new Wizard();
+		Owner w2 = new Owner();
 		w2.setId(2);
 		w2.setName("Harry Potter");
 		w2.addArtifact(a2);
 		w2.addArtifact(a4);
 
 
-		Wizard w3 = new Wizard();
+		Owner w3 = new Owner();
 		w3.setId(3);
 		w3.setName("Hermione Granger");
 		w3.addArtifact(a5);

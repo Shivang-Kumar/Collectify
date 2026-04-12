@@ -4,7 +4,7 @@ import java.io.Serializable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import edu.tcu.cs.hogwarts_artifacts_online.Wizard.Wizard;
+import edu.tcu.cs.hogwarts_artifacts_online.Owner.Owner;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
@@ -23,12 +23,12 @@ public class Artifact implements Serializable {
   @ManyToOne
 //  @JsonIgnore
   //Causes infinite recursion problem thus we can also use DTO  to prevent this
-  private Wizard owner;
+  private Owner owner;
   
-public Wizard getOwner() {
+public Owner getOwner() {
 	return owner;
 }
-public void setOwner(Wizard owner) {
+public void setOwner(Owner owner) {
 	this.owner = owner;
 }
 public Artifact() {

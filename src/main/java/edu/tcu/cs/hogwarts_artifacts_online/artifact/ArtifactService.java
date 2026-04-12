@@ -19,8 +19,8 @@ import org.hibernate.Hibernate;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.tcu.cs.hogwarts_artifacts_online.Wizard.Wizard;
-import edu.tcu.cs.hogwarts_artifacts_online.Wizard.dto.WizardDto;
+import edu.tcu.cs.hogwarts_artifacts_online.Owner.Owner;
+import edu.tcu.cs.hogwarts_artifacts_online.OwnerDto.dto.OwnerDto;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.DTO.ArtifactDto;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.converter.ArtifactToArtifactDtoConverter;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.utils.CommonUtils;

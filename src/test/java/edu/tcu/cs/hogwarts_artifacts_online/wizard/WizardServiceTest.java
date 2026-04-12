@@ -21,9 +21,9 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
-import edu.tcu.cs.hogwarts_artifacts_online.Wizard.Wizard;
-import edu.tcu.cs.hogwarts_artifacts_online.Wizard.WizardRepository;
-import edu.tcu.cs.hogwarts_artifacts_online.Wizard.WizardService;
+import edu.tcu.cs.hogwarts_artifacts_online.Owner.Owner;
+import edu.tcu.cs.hogwarts_artifacts_online.Owner.OwnerRepository;
+import edu.tcu.cs.hogwarts_artifacts_online.Owner.OwnerService;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.Artifact;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.ArtifactRepository;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.utils.IdWorker;
@@ -34,7 +34,7 @@ import edu.tcu.cs.hogwarts_artifacts_online.system.ObjectNotFoundException;
 public class WizardServiceTest {
 
 	@Mock
-	WizardRepository wizardRepository;
+	OwnerRepository wizardRepository;
 
 	@Mock
 	ArtifactRepository artifactRepository;
@@ -43,21 +43,21 @@ public class WizardServiceTest {
 	IdWorker idWorker;
 
 	@InjectMocks
-	WizardService wizardService;
+	OwnerService wizardService;
 
-	List<Wizard> wizards;
+	List<Owner> wizards;
 
 	@BeforeEach
 	void setUp() {
-		Wizard w1 = new Wizard();
+		Owner w1 = new Owner();
 		w1.setName("Albus Dumbeldore");
 		w1.setId(1213245645);
 
-		Wizard w2 = new Wizard();
+		Owner w2 = new Owner();
 		w2.setName("Harry Potter");
 		w2.setId(54654651);
 
-		wizards = new ArrayList<Wizard>();
+		wizards = new ArrayList<Owner>();
 		wizards.add(w1);
 		wizards.add(w2);
 	}
@@ -69,7 +69,7 @@ public class WizardServiceTest {
 
 		// when
 
-		List<Wizard> actualWizards = wizardService.findAll();
+		List<Owner> actualWizards = wizardService.findAll();
 
 		// then
 		assertThat(actualWizards.size()).isEqualTo(this.wizards.size());
@@ -97,7 +97,7 @@ public class WizardServiceTest {
 		artifacts1.add(a2);
 
 		// Given
-		Wizard w = new Wizard();
+		Owner w = new Owner();
 		w.setId(1);
 		w.setName("Harry Potter");
 		w.setArtifacts(artifacts1);
@@ -106,7 +106,7 @@ public class WizardServiceTest {
 		given(wizardRepository.save(w)).willReturn(w);
 
 		// when
-		Wizard savedWizard = wizardService.save(w);
+		Owner savedWizard = wizardService.save(w);
 
 		// then
 		assertThat(savedWizard.getId()).isEqualTo(1);
@@ -134,7 +134,7 @@ public class WizardServiceTest {
 		a2.setImageUrl("ImageUrl");
 		artifacts1.add(a2);
 
-		Wizard w = new Wizard();
+		Owner w = new Owner();
 		w.setId(1);
 		w.setName("Harry Potter");
 		w.setArtifacts(artifacts1);
@@ -142,7 +142,7 @@ public class WizardServiceTest {
 		// Given
 		given(wizardRepository.findById(1)).willReturn(Optional.of(w));
 		// When
-		Wizard foundWizard = wizardService.findById(1);
+		Owner foundWizard = wizardService.findById(1);
 		// Then
 		assertThat(foundWizard.getId()).isEqualTo(1);
 		assertThat(foundWizard.getName()).isEqualTo("Harry Potter");
@@ -156,11 +156,11 @@ public class WizardServiceTest {
 		given(wizardRepository.findById(Mockito.any(Integer.class))).willReturn(Optional.empty());
 		// When
 		Throwable thrown = catchThrowable(() -> {
-			Wizard foundWizard = wizardService.findById(1);
+			Owner foundWizard = wizardService.findById(1);
 		});
 		// Then
 		assertThat(thrown).isInstanceOf(ObjectNotFoundException.class)
-				.hasMessage("Could not find wizard with id 1  :(");
+				.hasMessage("Could not find owner with id 1  :(");
 		verify(wizardRepository, times(1)).findById(1);
 	}
 
@@ -182,12 +182,12 @@ public class WizardServiceTest {
 		a2.setImageUrl("ImageUrl");
 		artifacts1.add(a2);
 
-		Wizard w = new Wizard();
+		Owner w = new Owner();
 		w.setId(1);
 		w.setName("Harry Potter");
 		w.setArtifacts(artifacts1);
 
-		Wizard updatedWizard = new Wizard();
+		Owner updatedWizard = new Owner();
 		updatedWizard.setId(1);
 		updatedWizard.setName("Komko Sirus");
 		updatedWizard.setArtifacts(artifacts1);
@@ -198,7 +198,7 @@ public class WizardServiceTest {
 		given(wizardRepository.save(w)).willReturn(updatedWizard);
 
 		// When
-		Wizard savedWizard = this.wizardService.updateWizard(1, updatedWizard);
+		Owner savedWizard = this.wizardService.updateOwner(1, updatedWizard);
 
 		// Then
 
@@ -226,7 +226,7 @@ public class WizardServiceTest {
 		a2.setImageUrl("ImageUrl");
 		artifacts1.add(a2);
 
-		Wizard w = new Wizard();
+		Owner w = new Owner();
 		w.setId(1);
 		w.setName("Harry Potter");
 		w.setArtifacts(artifacts1);
@@ -237,7 +237,7 @@ public class WizardServiceTest {
 		// when
 		assertThrows(ObjectNotFoundException.class, () -> {
 
-			Wizard savedWizard = this.wizardService.updateWizard(1, w);
+			Owner savedWizard = this.wizardService.updateOwner(1, w);
 		});
 
 		// then
@@ -264,7 +264,7 @@ public class WizardServiceTest {
 		a2.setImageUrl("ImageUrl");
 		artifacts1.add(a2);
 
-		Wizard w = new Wizard();
+		Owner w = new Owner();
 		w.setId(1);
 		w.setName("Harry Potter");
 		w.setArtifacts(artifacts1);
@@ -274,7 +274,7 @@ public class WizardServiceTest {
 		doNothing().when(this.wizardRepository).deleteById(1);
 
 		// when
-		this.wizardService.deleteWizardById(1);
+		this.wizardService.deleteOwnerById(1);
 
 		// then
 		verify(wizardRepository, times(1)).deleteById(1);
@@ -293,7 +293,7 @@ public class WizardServiceTest {
 
 		// when
 		assertThrows(ObjectNotFoundException.class, () -> {
-			wizardService.deleteWizardById(1);
+			wizardService.deleteOwnerById(1);
 		});
 		// then
 		verify(wizardRepository, times(1)).findById(1);
@@ -309,7 +309,7 @@ public class WizardServiceTest {
 		a1.setDescription("A deluminator is a device invented by albus dumbeldore");
 		a1.setImageUrl("ImageUrl");
 
-		Wizard w = new Wizard();
+		Owner w = new Owner();
 		w.setId(1);
 		w.setName("Harry Potter");
 
@@ -318,7 +318,7 @@ public class WizardServiceTest {
 		given(this.wizardRepository.findById(3)).willReturn(Optional.of(w));
 
 		// When
-		this.wizardService.assignArtifactToWizard("1", 3);
+		this.wizardService.assignArtifactToOwner("1", 3);
 
 		// Then
 		verify(wizardRepository, times(1)).findById(3);
@@ -337,12 +337,12 @@ public class WizardServiceTest {
 		a1.setDescription("A deluminator is a device invented by albus dumbeldore");
 		a1.setImageUrl("ImageUrl");
 		
-		Wizard w2=new Wizard();
+		Owner w2=new Owner();
 		w2.setId(2);
 		w2.setName("Harry Potter");
 		w2.addArtifact(a1);
 		
-		Wizard w3=new Wizard();
+		Owner w3=new Owner();
 		w3.setId(3);
 		w3.setName("Naville Longbottom");
 		
@@ -365,7 +365,7 @@ public class WizardServiceTest {
 		a1.setDescription("A deluminator is a device invented by albus dumbeldore");
 		a1.setImageUrl("ImageUrl");
 		
-		Wizard w2=new Wizard();
+		Owner w2=new Owner();
 		w2.setId(2);
 		w2.setName("Harry Potter");
 		w2.addArtifact(a1);
@@ -380,7 +380,7 @@ public class WizardServiceTest {
 			this.wizardService.assignArtifact(3, "21232456489892566");
 		});
 		//Then
-		assertThat(thrown).isInstanceOf(ObjectNotFoundException.class).hasMessage("Could not find wizard with id 3  :(");
+		assertThat(thrown).isInstanceOf(ObjectNotFoundException.class).hasMessage("Could not find owner with id 3  :(");
 		assertThat(a1.getOwner().getId()).isEqualTo(2);
 	}
 	

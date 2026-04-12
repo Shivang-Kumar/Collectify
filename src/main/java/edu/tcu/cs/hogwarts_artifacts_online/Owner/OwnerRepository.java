@@ -1,4 +1,4 @@
-package edu.tcu.cs.hogwarts_artifacts_online.Wizard;
+package edu.tcu.cs.hogwarts_artifacts_online.Owner;
 
 import java.util.List;
 
@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 
 
 @Repository
-public interface WizardRepository extends JpaRepository<Wizard, Integer> {
+public interface OwnerRepository extends JpaRepository<Owner, Integer> {
 	
 	
 

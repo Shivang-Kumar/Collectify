@@ -25,8 +25,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import edu.tcu.cs.hogwarts_artifacts_online.Wizard.Wizard;
-import edu.tcu.cs.hogwarts_artifacts_online.Wizard.dto.WizardDto;
+import edu.tcu.cs.hogwarts_artifacts_online.Owner.Owner;
+import edu.tcu.cs.hogwarts_artifacts_online.OwnerDto.dto.OwnerDto;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.DTO.ArtifactDto;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.converter.ArtifactToArtifactDtoConverter;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.utils.IdWorker;
@@ -100,7 +100,7 @@ public class ArtifactServiceTest {
 		a.setDescription("An invisibility cloack is used to make the wearer invisible");
 		a.setImageUrl("ImageUrl");
 
-		Wizard w = new Wizard();
+		Owner w = new Owner();
 		w.setId(2);
 		w.setName("Harry Potter");
 
@@ -278,7 +278,7 @@ public class ArtifactServiceTest {
 	@Test
 	void testSummarizeSuccess() throws Exception {
 		//Given
-		WizardDto wizardDto=new WizardDto(1, "Albus dumbeldore", 2);
+		OwnerDto wizardDto=new OwnerDto(1, "Albus dumbeldore", 2);
 		List<ArtifactDto> artifactDto=List.of(
 				new ArtifactDto("123456","Deluminitor","Deluminitor is a good device",null,wizardDto),
 				new ArtifactDto("123456789","Deluminitor2","Deluminitor is a good device 2",null,wizardDto)
