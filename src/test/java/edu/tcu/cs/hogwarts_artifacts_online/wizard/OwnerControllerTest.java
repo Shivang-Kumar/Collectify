@@ -28,9 +28,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
-import edu.tcu.cs.hogwarts_artifacts_online.Wizard.Wizard;
-import edu.tcu.cs.hogwarts_artifacts_online.Wizard.WizardService;
-import edu.tcu.cs.hogwarts_artifacts_online.Wizard.dto.WizardDto;
+import edu.tcu.cs.hogwarts_artifacts_online.Owner.Owner;
+import edu.tcu.cs.hogwarts_artifacts_online.Owner.OwnerService;
+import edu.tcu.cs.hogwarts_artifacts_online.OwnerDto.dto.OwnerDto;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.Artifact;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.DTO.ArtifactDto;
 import edu.tcu.cs.hogwarts_artifacts_online.system.ObjectNotFoundException;
@@ -39,12 +39,12 @@ import edu.tcu.cs.hogwarts_artifacts_online.system.StatusCode;
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)//Turning off spring security
 @ActiveProfiles(value="dev")
-public class WizardControllerTest {
+public class OwnerControllerTest {
 	@Autowired
 	MockMvc mockMvc;
 
 	@MockBean
-	WizardService wizardService;
+	OwnerService ownerService;
 
 	@Autowired
 	ObjectMapper objectMapper;
@@ -52,7 +52,7 @@ public class WizardControllerTest {
 	@Value("${api.endpoint.base-url}")
 	String baseUrl;
 
-	List<Wizard> wizards;
+	List<Owner> owners;
 
 	@BeforeEach
 	void setUp() {
@@ -89,26 +89,26 @@ public class WizardControllerTest {
 		a4.setImageUrl("ImageUrl");
 		artifacts2.add(a4);
 
-		Wizard w1 = new Wizard();
+		Owner w1 = new Owner();
 		w1.setId(1);
 		w1.setName("Albus Dumbeldore");
 		w1.setArtifacts(artifacts1);
 
-		Wizard w2 = new Wizard();
+		Owner w2 = new Owner();
 		w2.setId(2);
 		w2.setName("Harry Potter");
 		w2.setArtifacts(artifacts2);
 
-		wizards = new ArrayList<>();
-		wizards.add(w1);
-		wizards.add(w2);
+		owners = new ArrayList<>();
+		owners.add(w1);
+		owners.add(w2);
 
 	}
 
 	@Test
-	void testFindAllWizardSuccess() throws Exception {
+	void testFindAllOwnerSuccess() throws Exception {
 		// given
-		given(wizardService.findAll()).willReturn(this.wizards);
+		given(ownerService.findAll()).willReturn(this.owners);
 		// when and then
 		this.mockMvc.perform(get(this.baseUrl + "/wizards").accept(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.flag").value("true")).andExpect(jsonPath("$.code").value(StatusCode.SUCCESS))
@@ -118,18 +118,18 @@ public class WizardControllerTest {
 	}
 
 	@Test
-	void testAddWizardSuccess() throws Exception {
+	void testAddOwnerSuccess() throws Exception {
 
-		WizardDto wizardDto = new WizardDto(null, "Harry Potter", null);
+		OwnerDto ownerDto = new OwnerDto(null, "Harry Potter", null);
 
-		String json = this.objectMapper.writeValueAsString(wizardDto);
+		String json = this.objectMapper.writeValueAsString(ownerDto);
 
-		Wizard savedWizard = new Wizard();
-		savedWizard.setId(6);
-		savedWizard.setName("Harry Potter");
+		Owner savedOwner = new Owner();
+		savedOwner.setId(6);
+		savedOwner.setName("Harry Potter");
 
 		// given
-		given(this.wizardService.save(Mockito.any(Wizard.class))).willReturn(savedWizard);
+		given(this.ownerService.save(Mockito.any(Owner.class))).willReturn(savedOwner);
 
 		// when and then
 		this.mockMvc
@@ -142,9 +142,9 @@ public class WizardControllerTest {
 	}
 
 	@Test
-	void testFindWizardByIdSuccess() throws Exception {
+	void testFindOwnerByIdSuccess() throws Exception {
 		// Given
-		given(wizardService.findById(1)).willReturn(this.wizards.get(0));
+		given(ownerService.findById(1)).willReturn(this.owners.get(0));
 		// When and Then
 		this.mockMvc.perform(get(this.baseUrl + "/wizards/1").accept(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.flag").value(true)).andExpectAll(jsonPath("$.code").value(StatusCode.SUCCESS))
@@ -154,27 +154,27 @@ public class WizardControllerTest {
 	}
 
 	@Test
-	void testFindWizardByIdNotFound() throws Exception {
+	void testFindOwnerByIdNotFound() throws Exception {
 		// Given
-		given(this.wizardService.findById(1)).willThrow(new ObjectNotFoundException("wizard", 1));
+		given(this.ownerService.findById(1)).willThrow(new ObjectNotFoundException("owner", 1));
 		// When and Then
 		this.mockMvc.perform(get(this.baseUrl + "/wizards/1").accept(MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.flag").value(false)).andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
-				.andExpect(jsonPath("$.message").value("Could not find wizard with id 1  :("))
+				.andExpect(jsonPath("$.message").value("Could not find owner with id 1  :("))
 				.andExpect(jsonPath("$.data").isEmpty());
 	}
 
 	@Test
-	void testWizardUpdateSuccess() throws Exception {
-		WizardDto wizardDto = new WizardDto(null, "Goku Loki", null);
+	void testOwnerUpdateSuccess() throws Exception {
+		OwnerDto wizardDto = new OwnerDto(null, "Goku Loki", null);
 
 		String json = this.objectMapper.writeValueAsString(wizardDto);
 
-		Wizard savedWizard = new Wizard();
+		Owner savedWizard = new Owner();
 		savedWizard.setId(6);
 		savedWizard.setName("Harry Potter");
 
-		given(this.wizardService.updateWizard(eq(1), Mockito.any(Wizard.class))).willReturn(savedWizard);
+		given(this.ownerService.updateOwner(eq(1), Mockito.any(Owner.class))).willReturn(savedWizard);
 
 		// When and Then
 		this.mockMvc
@@ -186,28 +186,28 @@ public class WizardControllerTest {
 	}
 
 	@Test
-	void testWizardUpdateWithIdNotFound() throws Exception {
+	void testOwnerUpdateWithIdNotFound() throws Exception {
 
-		WizardDto wizardDto = new WizardDto(null, "Goku Loki", null);
+		OwnerDto ownerDto = new OwnerDto(null, "Goku Loki", null);
 
-		String json = this.objectMapper.writeValueAsString(wizardDto);
+		String json = this.objectMapper.writeValueAsString(ownerDto);
 
-		given(this.wizardService.updateWizard(eq(1), Mockito.any(Wizard.class)))
-				.willThrow(new ObjectNotFoundException("wizard", 1));
+		given(this.ownerService.updateOwner(eq(1), Mockito.any(Owner.class)))
+				.willThrow(new ObjectNotFoundException("owner", 1));
 
 		// When and Then
 		this.mockMvc
 				.perform(put(this.baseUrl + "/wizards/1").contentType(MediaType.APPLICATION_JSON).content(json)
 						.accept(org.springframework.http.MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.flag").value(false)).andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
-				.andExpect(jsonPath("$.message").value("Could not find wizard with id 1  :("))
+				.andExpect(jsonPath("$.message").value("Could not find owner with id 1  :("))
 				.andExpect(jsonPath("$.data").isEmpty());
 	}
 
 	@Test
-	void testDeleteWizardSuccess() throws Exception {
+	void testDeleteOwnerSuccess() throws Exception {
 		// Given
-		doNothing().when(this.wizardService).deleteWizardById(1);
+		doNothing().when(this.ownerService).deleteOwnerById(1);
 
 		// when and then
 		this.mockMvc
@@ -219,9 +219,9 @@ public class WizardControllerTest {
 	}
 
 	@Test
-	void testDeleteWizardIdNotFound() throws Exception {
+	void testDeleteOwnerIdNotFound() throws Exception {
 		// Given
-		doThrow(new ObjectNotFoundException("wizard", 1)).when(wizardService).deleteWizardById(1);
+		doThrow(new ObjectNotFoundException("wizard", 1)).when(ownerService).deleteOwnerById(1);
 
 		// When and then
 		this.mockMvc
@@ -236,7 +236,7 @@ public class WizardControllerTest {
 	@Test
 	void testAssignArtifactSuccess() throws Exception {
 		// Given
-		doNothing().when(this.wizardService).assignArtifact(2, "546489712315648975");
+		doNothing().when(this.ownerService).assignArtifact(2, "546489712315648975");
 		// When and then
 		this.mockMvc
 				.perform(put(this.baseUrl + "/wizards/2/artifacts/546489712315648975")
@@ -248,9 +248,9 @@ public class WizardControllerTest {
 	}
 
 	@Test
-	void testAssignArtifactErrorWithNonExistentWizardId() throws Exception {
+	void testAssignArtifactErrorWithNonExistentOwnerId() throws Exception {
 		// Given
-		doThrow(new ObjectNotFoundException("wizard", 3)).when(this.wizardService).assignArtifact(3,
+		doThrow(new ObjectNotFoundException("owner", 3)).when(this.ownerService).assignArtifact(3,
 				"546489712315648975");
 
 		// When and then
@@ -258,7 +258,7 @@ public class WizardControllerTest {
 				.perform(put(this.baseUrl + "/wizards/3/artifacts/546489712315648975")
 						.accept(org.springframework.http.MediaType.APPLICATION_JSON))
 				.andExpect(jsonPath("$.flag").value(false)).andExpect(jsonPath("$.code").value(StatusCode.NOT_FOUND))
-				.andExpect(jsonPath("$.message").value("Could not find wizard with id 3  :("))
+				.andExpect(jsonPath("$.message").value("Could not find owner with id 3  :("))
 				.andExpect(jsonPath("$.data").isEmpty());
 
 	}
@@ -266,7 +266,7 @@ public class WizardControllerTest {
 	@Test
 	void testAssignArtifactErrorWithNonExistentArtifactId() throws Exception {
 		// Given
-		doThrow(new ObjectNotFoundException("artifact", "546489712315648975")).when(this.wizardService).assignArtifact(3,
+		doThrow(new ObjectNotFoundException("artifact", "546489712315648975")).when(this.ownerService).assignArtifact(3,
 				"546489712315648975");
 
 		// When and then

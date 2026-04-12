@@ -1,4 +1,4 @@
-package edu.tcu.cs.hogwarts_artifacts_online.Wizard;
+package edu.tcu.cs.hogwarts_artifacts_online.Owner;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -14,7 +14,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 
 @Entity
-public class Wizard  implements Serializable{
+public class Owner  implements Serializable{
 	
 	@Id
 	//@GeneratedValue(strategy=GenerationType.AUTO)
@@ -25,7 +25,7 @@ public class Wizard  implements Serializable{
 	@OneToMany(cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.REMOVE},mappedBy= "owner")
 	private List<Artifact> artifacts=new ArrayList<>();
 	
-	public Wizard() {
+	public Owner() {
 		super();
 	}
 
