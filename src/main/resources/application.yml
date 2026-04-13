@@ -1,6 +1,16 @@
 spring:
   profiles:
     active: dev
+ 
+  kafka:
+   bootstrap-servers: localhost:9092
+   producer:
+    value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    key-serializer: org.apache.kafka.common.serialization.StringSerializer
+    listener:
+      ack-mode: manual
+
+
 api:
   endpoint:
     base-url: /api/v1

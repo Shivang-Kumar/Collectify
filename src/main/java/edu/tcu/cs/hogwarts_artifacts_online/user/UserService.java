@@ -2,13 +2,18 @@ package edu.tcu.cs.hogwarts_artifacts_online.user;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import edu.tcu.cs.hogwarts_artifacts_online.notification.Notification;
+import edu.tcu.cs.hogwarts_artifacts_online.notification.NotificationChannel;
+import edu.tcu.cs.hogwarts_artifacts_online.notification.NotificationEventPublisher;
 import edu.tcu.cs.hogwarts_artifacts_online.rediscache.RedisCacheClient;
 import edu.tcu.cs.hogwarts_artifacts_online.system.ObjectNotFoundException;
 import edu.tcu.cs.hogwarts_artifacts_online.system.exception.PasswordChangeIllegalArgumentException;
@@ -19,15 +24,16 @@ public class UserService implements UserDetailsService {
 	private UserRepository userRepository;
 	private PasswordEncoder passwordEncoder;
 	private RedisCacheClient redisCacheClient;
-
+    private NotificationEventPublisher publisher;
 	
 	
 	
-	public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,RedisCacheClient redisCacheClient) {
+	public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder,RedisCacheClient redisCacheClient,NotificationEventPublisher publisher) {
 		super();
 		this.userRepository = userRepository;
 		this.passwordEncoder = passwordEncoder;
 		this.redisCacheClient= redisCacheClient;
+		this.publisher=publisher;
 	}
 
 
@@ -39,7 +45,11 @@ public class UserService implements UserDetailsService {
 
 	public User addUser(User user) {
 		user.setPassword(this.passwordEncoder.encode(user.getPassword()));
-		return this.userRepository.save(user);
+		User savedUser=this.userRepository.save(user);
+		Notification notify=createNotification(user);
+		publisher.publish(notify);
+		return savedUser;
+
 	}
 	
 	public User findUserById(Integer id)
@@ -71,6 +81,18 @@ public class UserService implements UserDetailsService {
 	return this.userRepository.findByUsername(username)
 				.map(user -> new MyUserPrincipal(user))
 				.orElseThrow(() -> new UsernameNotFoundException("username"+username+" is not found."));
+	}
+	
+	private Notification createNotification(User user)
+	{
+		Notification notify=Notification.builder()
+				.eventId(UUID.randomUUID().toString())
+				.traceId(UUID.randomUUID().toString())
+				.channel(NotificationChannel.EMAIL)
+				.recipient(user.getUsername())
+				.templateId("USER-Created")
+				.build();
+		return notify;
 	}
 	
 

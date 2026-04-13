@@ -115,7 +115,7 @@ public class DbDataInitializer implements CommandLineRunner {
 		u1.setPassword("jkc");
 
 		User u2 = new User();
-		u2.setUsername("ABC_2");
+		u2.setUsername("2002shiva.2002@gmail.com");
 		u2.setRoles("user");
 		u2.setEnabled(true);
 		u2.setPassword("jhk");
