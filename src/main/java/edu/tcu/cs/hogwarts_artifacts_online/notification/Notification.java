@@ -1,6 +1,7 @@
 package edu.tcu.cs.hogwarts_artifacts_online.notification;
 
 import java.time.Instant;
+import java.util.Map;
 import java.util.UUID;
 
 
@@ -35,7 +36,7 @@ public class Notification {
 	
 	private String templateId;
 	
-	private String payload;
+	private Map<String, String> payload;
 	
 	
 }

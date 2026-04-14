@@ -1,6 +1,7 @@
 package edu.tcu.cs.hogwarts_artifacts_online.user;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -83,6 +84,10 @@ public class UserService implements UserDetailsService {
 				.orElseThrow(() -> new UsernameNotFoundException("username"+username+" is not found."));
 	}
 	
+	
+	
+	
+	
 	private Notification createNotification(User user)
 	{
 		Notification notify=Notification.builder()
@@ -90,7 +95,8 @@ public class UserService implements UserDetailsService {
 				.traceId(UUID.randomUUID().toString())
 				.channel(NotificationChannel.EMAIL)
 				.recipient(user.getUsername())
-				.templateId("USER-Created")
+				.templateId("USER-CREATED")
+				.payload(Map.of("name",user.getUsername()))
 				.build();
 		return notify;
 	}
