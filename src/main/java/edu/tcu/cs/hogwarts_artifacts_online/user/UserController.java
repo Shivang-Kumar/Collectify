@@ -81,6 +81,23 @@ public class UserController {
 		return new Result(true,StatusCode.SUCCESS,"Delete Success");
 	}
 	
+	
+	@PostMapping("/request-otp/{username}")
+	public Result getOtp(@PathVariable String username)
+	{
+		String otp=this.userService.generateOtp(username);
+		return new Result(true,StatusCode.SUCCESS,"Otp Created Successfully",otp);
+	}
+	
+	@PostMapping("/verify-otp/{username}/{otp}")
+	public Result verifyOtp(@PathVariable String username,@PathVariable String otp)
+	{
+		boolean verifyOtp=this.userService.verifyOtp(username,otp);
+		return new Result(true,StatusCode.SUCCESS,"Otp Created",verifyOtp);
+	}
+	
+	
+	
 	@PatchMapping("/{userId}/password")
 	public Result changePassword(@PathVariable Integer userId, @RequestBody Map<String,String> passwordMap)
 	{

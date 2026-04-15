@@ -1,9 +1,11 @@
 package edu.tcu.cs.hogwarts_artifacts_online.user;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -136,6 +138,51 @@ public class UserService implements UserDetailsService {
 	
 	this.userRepository.save(hogwartsUser);
 	
+	}
+
+
+	public String generateOtp(String username) {
+		User user=this.userRepository.findByUsername(username).orElseThrow(() -> new ObjectNotFoundException("user",username));
+		String randomOtp=randomOtpGenerator();
+		String hashOtp=this.passwordEncoder.encode(randomOtp);
+		String key=otpKeyGenerator(user.getId());
+		this.redisCacheClient.set(key,hashOtp,2, TimeUnit.MINUTES);
+		return randomOtp;
+	}
+	
+	private String otpKeyGenerator(Integer userId)
+	{
+		String key="otp:user:"+userId;
+		return key;
+	}
+	
+	private String resetTokenKey(Integer userId)
+	{
+		String key="reset-token:user:"+userId;
+		return key;
+	}
+	
+	private String randomOtpGenerator()
+	{
+		    SecureRandom random = new SecureRandom();
+	        int otp = 100000 + random.nextInt(900000);
+	        return Integer.toString(otp);
+	}
+
+
+	public boolean verifyOtp(String username, String otp) {
+		User user=this.userRepository.findByUsername(username).orElseThrow(() -> new ObjectNotFoundException("user",username));
+		String key=otpKeyGenerator(user.getId());
+		String hashedOtp=this.passwordEncoder.encode(otp);
+		String storedHashedOtp=this.redisCacheClient.get(key);
+		if(hashedOtp.equals(storedHashedOtp))
+		{
+			String resetTokenKey=resetTokenKey(user.getId());
+			this.redisCacheClient.set(resetTokenKey,UUID.randomUUID().toString(),5,TimeUnit.MINUTES);
+			this.redisCacheClient.delete(otpKeyGenerator(user.getId()));
+			return true;
+		}
+		return false;
 	}
 
 }
