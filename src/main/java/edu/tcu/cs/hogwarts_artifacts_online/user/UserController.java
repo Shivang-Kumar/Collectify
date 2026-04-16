@@ -2,6 +2,7 @@ package edu.tcu.cs.hogwarts_artifacts_online.user;
 
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -81,7 +83,25 @@ public class UserController {
 		return new Result(true,StatusCode.SUCCESS,"Delete Success");
 	}
 	
-	@PatchMapping("/{userId}/password")
+	
+	@PostMapping("/request-otp/{username}")
+	public Result getOtp(@PathVariable String username)
+	{
+		String otp=this.userService.generateOtp(username);
+		return new Result(true,StatusCode.SUCCESS,"Otp Created Successfully",otp);
+	}
+	
+	@PostMapping("/verify-otp/{username}/{otp}")
+	public Result verifyOtp(@PathVariable String username,@PathVariable String otp)
+	{
+		String  resetTokenKey=this.userService.verifyOtp(username,otp);
+		String status=resetTokenKey!=null?"OTP verified Succesfully":"OTP verififcation failed";
+		return new Result(true,StatusCode.SUCCESS,status,resetTokenKey);
+	}
+	
+	
+	
+	@PatchMapping("/{userId}/logged-in-password-change")
 	public Result changePassword(@PathVariable Integer userId, @RequestBody Map<String,String> passwordMap)
 	{
 		String oldPassword=passwordMap.get("oldPassword");
@@ -90,5 +110,16 @@ public class UserController {
 		this.userService.changePassword(userId,oldPassword,newPassword,confirmPassword);
 		return new Result(true,StatusCode.SUCCESS,"Change Password Success", null);
 	}
+	
+	@PatchMapping("/{userId}/non-logged-in-password-change")
+	public Result changePasswordByOtp(@PathVariable Integer userId, @RequestBody Map<String, String> request) {
+
+	    String newPassword = request.get("newPassword");
+	    String confirmPassword = request.get("confirmPassword");
+	    String resetToken = request.get("resetToken");
+		this.userService.changePasswordByOtp(userId,newPassword,confirmPassword,resetToken);
+		return new Result(true,StatusCode.SUCCESS,"Change Password Success", null);
+	}
 
 }
+

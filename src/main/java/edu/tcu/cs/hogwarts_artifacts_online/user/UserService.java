@@ -1,9 +1,11 @@
 package edu.tcu.cs.hogwarts_artifacts_online.user;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -105,10 +107,12 @@ public class UserService implements UserDetailsService {
 
 	public void changePassword(Integer userId, String oldPassword, String newPassword, String confirmPassword) {
 		
-	User hogwartsUser=	this.userRepository.findById(userId).orElseThrow(()-> new ObjectNotFoundException("user", userId));
+	User user=	this.userRepository.findById(userId).orElseThrow(()-> new ObjectNotFoundException("user", userId));
+	
+
 	
 	//If old Password is not correct , throw an exception
-	if(!this.passwordEncoder.matches(oldPassword, hogwartsUser.getPassword()))
+	if(!this.passwordEncoder.matches(oldPassword, user.getPassword()))
 	{
 		throw new PasswordChangeIllegalArgumentException("Old Password is incorrect.");
 	}
@@ -127,15 +131,105 @@ public class UserService implements UserDetailsService {
 		throw new PasswordChangeIllegalArgumentException("New Password does not follow password policy");
 	}
 	
-	hogwartsUser.setPassword(this.passwordEncoder.encode(newPassword));
+	user.setPassword(this.passwordEncoder.encode(newPassword));
 	
 	
 	
 	//Revoke users's current jwt token by deleting in redis before saving new password
 	this.redisCacheClient.delete("whitelist:"+userId);
 	
-	this.userRepository.save(hogwartsUser);
+	this.userRepository.save(user);
 	
+	}
+	
+	public void changePasswordByOtp(Integer userId, String newPassword, String confirmPassword, String resetToken) {
+		
+		User user=	this.userRepository.findById(userId).orElseThrow(()-> new ObjectNotFoundException("user", userId));
+		
+		String resetTokenKey=resetTokenKey(userId);
+		if(verifyResetToken(resetTokenKey,resetToken)==false)
+		throw new RuntimeException("Reset token has expired or is invalid");
+		
+		
+		
+		//If new Password and confirm new Password does not match , throw an exception
+		if(!newPassword.equals(confirmPassword))
+		{
+			throw new PasswordChangeIllegalArgumentException("New Password and Confirm new Password does not match");
+		}
+		
+		// The new Password must contain at least one digit, one lowercase, one uppercase letter, and one special character
+		String passwordPolicy = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!()_{}\\[\\]:;\"'<>,.?/~`|\\\\-]).+$";
+
+		if(!newPassword.matches(passwordPolicy))
+		{
+			throw new PasswordChangeIllegalArgumentException("New Password does not follow password policy");
+		}
+		
+		user.setPassword(this.passwordEncoder.encode(newPassword));
+		
+		
+		
+		//Revoke users's current jwt token by deleting in redis before saving new password
+		this.redisCacheClient.delete("whitelist:"+userId);
+		
+		this.redisCacheClient.delete(resetTokenKey);
+		this.userRepository.save(user);
+		
+		}
+
+
+	public String generateOtp(String username) {
+		User user=this.userRepository.findByUsername(username).orElseThrow(() -> new ObjectNotFoundException("user",username));
+		String randomOtp=randomOtpGenerator();
+		String hashOtp=this.passwordEncoder.encode(randomOtp);
+		String key=otpKeyGenerator(user.getId());
+		this.redisCacheClient.set(key,hashOtp,2, TimeUnit.MINUTES);
+		return randomOtp;
+	}
+	
+	private String otpKeyGenerator(Integer userId)
+	{
+		String key="otp:user:"+userId;
+		return key;
+	}
+	
+	private String resetTokenKey(Integer userId)
+	{
+		String key="reset-token:user:"+userId;
+		return key;
+	}
+	
+	private String randomOtpGenerator()
+	{
+		    SecureRandom random = new SecureRandom();
+	        int otp = 100000 + random.nextInt(900000);
+	        return otp+"";
+	}
+
+
+	public String verifyOtp(String username, String otp) {
+		User user=this.userRepository.findByUsername(username).orElseThrow(() -> new ObjectNotFoundException("user",username));
+		String key=otpKeyGenerator(user.getId());
+		String storedHashedOtp=this.redisCacheClient.get(key);
+		if(storedHashedOtp!=null && this.passwordEncoder.matches(otp,storedHashedOtp))
+		{
+			
+			System.out.println("Code matched herer===================");
+			String resetTokenKey=resetTokenKey(user.getId());
+			String resetTokenValue=UUID.randomUUID().toString();
+			this.redisCacheClient.set(resetTokenKey,resetTokenValue,5,TimeUnit.MINUTES);
+			this.redisCacheClient.delete(otpKeyGenerator(user.getId()));
+			return resetTokenValue;
+		}
+		
+		return null;
+	}
+	
+	public boolean verifyResetToken(String resetTokenKey,String token)
+	{
+		String storedResetToken=this.redisCacheClient.get(resetTokenKey);
+		return storedResetToken.equals(token)?true:false;
 	}
 
 }
