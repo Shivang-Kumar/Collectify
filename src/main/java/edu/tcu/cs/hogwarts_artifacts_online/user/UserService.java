@@ -107,10 +107,12 @@ public class UserService implements UserDetailsService {
 
 	public void changePassword(Integer userId, String oldPassword, String newPassword, String confirmPassword) {
 		
-	User hogwartsUser=	this.userRepository.findById(userId).orElseThrow(()-> new ObjectNotFoundException("user", userId));
+	User user=	this.userRepository.findById(userId).orElseThrow(()-> new ObjectNotFoundException("user", userId));
+	
+
 	
 	//If old Password is not correct , throw an exception
-	if(!this.passwordEncoder.matches(oldPassword, hogwartsUser.getPassword()))
+	if(!this.passwordEncoder.matches(oldPassword, user.getPassword()))
 	{
 		throw new PasswordChangeIllegalArgumentException("Old Password is incorrect.");
 	}
@@ -129,16 +131,52 @@ public class UserService implements UserDetailsService {
 		throw new PasswordChangeIllegalArgumentException("New Password does not follow password policy");
 	}
 	
-	hogwartsUser.setPassword(this.passwordEncoder.encode(newPassword));
+	user.setPassword(this.passwordEncoder.encode(newPassword));
 	
 	
 	
 	//Revoke users's current jwt token by deleting in redis before saving new password
 	this.redisCacheClient.delete("whitelist:"+userId);
 	
-	this.userRepository.save(hogwartsUser);
+	this.userRepository.save(user);
 	
 	}
+	
+	public void changePasswordByOtp(Integer userId, String newPassword, String confirmPassword, String resetToken) {
+		
+		User user=	this.userRepository.findById(userId).orElseThrow(()-> new ObjectNotFoundException("user", userId));
+		
+		String resetTokenKey=resetTokenKey(userId);
+		if(verifyResetToken(resetTokenKey,resetToken)==false)
+		throw new RuntimeException("Reset token has expired or is invalid");
+		
+		
+		
+		//If new Password and confirm new Password does not match , throw an exception
+		if(!newPassword.equals(confirmPassword))
+		{
+			throw new PasswordChangeIllegalArgumentException("New Password and Confirm new Password does not match");
+		}
+		
+		// The new Password must contain at least one digit, one lowercase, one uppercase letter, and one special character
+		String passwordPolicy = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!()_{}\\[\\]:;\"'<>,.?/~`|\\\\-]).+$";
+
+		if(!newPassword.matches(passwordPolicy))
+		{
+			throw new PasswordChangeIllegalArgumentException("New Password does not follow password policy");
+		}
+		
+		user.setPassword(this.passwordEncoder.encode(newPassword));
+		
+		
+		
+		//Revoke users's current jwt token by deleting in redis before saving new password
+		this.redisCacheClient.delete("whitelist:"+userId);
+		
+		this.redisCacheClient.delete(resetTokenKey);
+		this.userRepository.save(user);
+		
+		}
 
 
 	public String generateOtp(String username) {
@@ -166,23 +204,32 @@ public class UserService implements UserDetailsService {
 	{
 		    SecureRandom random = new SecureRandom();
 	        int otp = 100000 + random.nextInt(900000);
-	        return Integer.toString(otp);
+	        return otp+"";
 	}
 
 
-	public boolean verifyOtp(String username, String otp) {
+	public String verifyOtp(String username, String otp) {
 		User user=this.userRepository.findByUsername(username).orElseThrow(() -> new ObjectNotFoundException("user",username));
 		String key=otpKeyGenerator(user.getId());
-		String hashedOtp=this.passwordEncoder.encode(otp);
 		String storedHashedOtp=this.redisCacheClient.get(key);
-		if(hashedOtp.equals(storedHashedOtp))
+		if(storedHashedOtp!=null && this.passwordEncoder.matches(otp,storedHashedOtp))
 		{
+			
+			System.out.println("Code matched herer===================");
 			String resetTokenKey=resetTokenKey(user.getId());
-			this.redisCacheClient.set(resetTokenKey,UUID.randomUUID().toString(),5,TimeUnit.MINUTES);
+			String resetTokenValue=UUID.randomUUID().toString();
+			this.redisCacheClient.set(resetTokenKey,resetTokenValue,5,TimeUnit.MINUTES);
 			this.redisCacheClient.delete(otpKeyGenerator(user.getId()));
-			return true;
+			return resetTokenValue;
 		}
-		return false;
+		
+		return null;
+	}
+	
+	public boolean verifyResetToken(String resetTokenKey,String token)
+	{
+		String storedResetToken=this.redisCacheClient.get(resetTokenKey);
+		return storedResetToken.equals(token)?true:false;
 	}
 
 }
