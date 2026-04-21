@@ -144,9 +144,10 @@ public class UserService implements UserDetailsService {
 	
 	public void changePasswordByOtp(Integer userId, String newPassword, String confirmPassword, String resetToken) {
 		
+		
 		User user=	this.userRepository.findById(userId).orElseThrow(()-> new ObjectNotFoundException("user", userId));
 		
-		String resetTokenKey=resetTokenKey(userId);
+		String resetTokenKey=resetTokenKey(user.getId());
 		if(verifyResetToken(resetTokenKey,resetToken)==false)
 		throw new RuntimeException("Reset token has expired or is invalid");
 		
