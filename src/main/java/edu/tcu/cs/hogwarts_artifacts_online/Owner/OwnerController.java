@@ -23,7 +23,7 @@ import edu.tcu.cs.hogwarts_artifacts_online.system.StatusCode;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/v1/wizards")
+@RequestMapping("/api/v1/owners")
 public class OwnerController {
 
 	private final OwnerService ownerService;
@@ -82,7 +82,7 @@ public class OwnerController {
 		return new Result(true, StatusCode.SUCCESS, "Artifact Assignment Success");
 	}
 
-	@GetMapping("/leaderboard/wizards")
+	@GetMapping("/leaderboard/owner")
 	public Result getLeaderboard(@RequestParam(defaultValue = "10") int limit) {
 		List<Object> ans = this.ownerService.getLeaderboard("owners", "artifacts", limit);
 		return new Result(true, StatusCode.SUCCESS, "Owner Leaderboard", ans);
