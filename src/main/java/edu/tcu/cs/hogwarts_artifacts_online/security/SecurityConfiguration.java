@@ -41,15 +41,17 @@ public class SecurityConfiguration {
 	private final CustomBasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint;
 	private final CustomBearerTokenAuthenticationEntryPoint customBearerTokenAuthenticationEntryPoint;
 	private final CustomBearerTokenAccessDeniedException customBearerTokenAccessDeniedException;
+	private final UserRequestAuthorizationManager userRequestAuthorizationManager;
 
 	public SecurityConfiguration(CustomBasicAuthenticationEntryPoint customBasicAuthenticationEntryPoint,
 			CustomBearerTokenAuthenticationEntryPoint customBearerTokenAuthenticationEntryPoint,
-			CustomBearerTokenAccessDeniedException customBearerTokenAccessDeniedException)
+			CustomBearerTokenAccessDeniedException customBearerTokenAccessDeniedException,UserRequestAuthorizationManager userRequestAuthorizationManager)
 			throws NoSuchAlgorithmException {
 		super();
 		this.customBasicAuthenticationEntryPoint = customBasicAuthenticationEntryPoint;
 		this.customBearerTokenAuthenticationEntryPoint = customBearerTokenAuthenticationEntryPoint;
 		this.customBearerTokenAccessDeniedException = customBearerTokenAccessDeniedException;
+		this.userRequestAuthorizationManager=userRequestAuthorizationManager;
 		// Generate a public/Private key pair
 		KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance("RSA");
 		keyPairGenerator.initialize(2048);// Generated key will have size of 2048 bits
@@ -67,12 +69,10 @@ public class SecurityConfiguration {
 		return http
 				.authorizeHttpRequests(authorizeHttpRequest -> authorizeHttpRequest
 						.requestMatchers(HttpMethod.GET, this.baseUrl + "/artifacts/**").permitAll()
-						.requestMatchers(HttpMethod.GET, this.baseUrl + "/users/**").hasAuthority("ROLE_admin")// Protecting
-																												// this
-																												// end
-																												// point
+						.requestMatchers(HttpMethod.GET, this.baseUrl + "/users").hasAuthority("ROLE_admin")// Protecting end point
+						.requestMatchers(HttpMethod.GET, this.baseUrl + "/users/**").access(this.userRequestAuthorizationManager)		  //Authorization rule is defined in userRequestAuthorizationManager																	// this
 						.requestMatchers(HttpMethod.POST, this.baseUrl + "/users").hasAuthority("ROLE_admin")
-						.requestMatchers(HttpMethod.PUT, this.baseUrl + "/users/**").hasAuthority("ROLE_admin")
+						.requestMatchers(HttpMethod.PUT, this.baseUrl + "/users/**").access(this.userRequestAuthorizationManager)
 						.requestMatchers(HttpMethod.DELETE, this.baseUrl + "/users/**").hasAuthority("ROLE_admin")
 						.requestMatchers(
 				                "/v3/api-docs/**",
