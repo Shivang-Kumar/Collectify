@@ -8,6 +8,8 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -63,12 +65,19 @@ public class UserService implements UserDetailsService {
 
 
 	public User updateUser(Integer userId,User user) {
-	return this.userRepository.findById(userId).map(foundUser -> {
+	User foundUser=this.userRepository.findById(userId).orElseThrow(() ->  new ObjectNotFoundException("user", userId));
+	
+	//If user is not admin then he can only update username
+	Authentication securityContext=(Authentication) SecurityContextHolder.getContext().getAuthentication();
+	if(securityContext.getAuthorities().stream().noneMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("Role_admin")))
+	{
 		foundUser.setUsername(user.getUsername());
-		foundUser.setEnabled(user.isEnabled());
-		foundUser.setRoles(user.getRoles());
-		return this.userRepository.save(foundUser);
-	}).orElseThrow(() ->  new ObjectNotFoundException("user", userId));
+	}else {
+	foundUser.setUsername(user.getUsername());
+	foundUser.setEnabled(user.isEnabled());
+	foundUser.setRoles(user.getRoles());
+	}
+	return this.userRepository.save(foundUser);
 	}
 
 
