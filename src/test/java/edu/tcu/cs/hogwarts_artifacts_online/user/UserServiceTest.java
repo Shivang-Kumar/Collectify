@@ -19,8 +19,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
+
+import com.nimbusds.jose.proc.SecurityContext;
 
 import edu.tcu.cs.hogwarts_artifacts_online.Owner.Owner;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.Artifact;
@@ -157,7 +161,15 @@ public class UserServiceTest {
 		u3.setRoles("User admin");
 		u3.setEnabled(false);
 		u3.setPassword("jkc");
-
+		
+		User myUser=new User();
+		myUser.setRoles("admin");
+		MyUserPrincipal myUserPrincipal=new MyUserPrincipal(myUser);
+		org.springframework.security.core.context.SecurityContext securityContext=(org.springframework.security.core.context.SecurityContext) SecurityContextHolder.createEmptyContext();
+		securityContext.setAuthentication(new UsernamePasswordAuthenticationToken(myUserPrincipal, null,myUserPrincipal.getAuthorities()));
+		SecurityContextHolder.setContext(securityContext);
+		
+		
 		given(userRepository.findById(1)).willReturn(Optional.of(u3));
 		given(userRepository.save(u3)).willReturn(u3);
 
