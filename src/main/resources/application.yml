@@ -10,6 +10,13 @@ spring:
     listener:
       ack-mode: manual
 
+otel:
+  exporter:
+   otlp:
+    endpoint: http://localhost:4317
+   service:
+     name: hogwarts-artifacts-online
+
 
 api:
   endpoint:
