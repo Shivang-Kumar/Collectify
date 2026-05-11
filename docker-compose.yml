@@ -19,12 +19,6 @@ services:
     env_file:
       - ./docker/grafana/grafana-config.env  # Load environment variables (if needed)
 
-  zipkin:
-    image: openzipkin/zipkin
-    container_name: zipkin
-    ports:
-      - 9411:9411
-
   redis:
     image: redis
     ports:
@@ -43,3 +37,23 @@ services:
       - 8025:8025  # Web UI
       - 1025:1025  # SMTP server
     restart: unless-stopped
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./docker/tempo/tempo.yaml:/etc/tempo.yaml
+    ports:
+      - 3200:3200   # Tempo UI
+  
+  otel-collector:
+     image: otel/opentelemetry-collector-contrib:latest
+     container_name: otel-collector
+     volumes:
+       - ./docker/otel-collector/otel-collector.yaml:/etc/otel-collector.yaml
+     command: [ "--config=/etc/otel-collector.yaml" ]
+     ports:
+       - 4317:4317   # OTLP gRPC receiver
+     depends_on:
+       - tempo
