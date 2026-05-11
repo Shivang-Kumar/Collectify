@@ -10,11 +10,19 @@ spring:
     listener:
       ack-mode: manual
 
+otel:
+  exporter:
+   
+   service:
+     name: hogwarts-artifacts-online
+
 
 api:
   endpoint:
     base-url: /api/v1
 management:
+  otlp:
+    endpoint: http://localhost:4317
   endpoints:
     web:
      exposure:
