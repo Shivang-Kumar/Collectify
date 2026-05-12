@@ -1,4 +1,6 @@
 spring:
+  application:
+   name: collectify   
   profiles:
     active: dev
  
@@ -7,14 +9,10 @@ spring:
    producer:
     value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     key-serializer: org.apache.kafka.common.serialization.StringSerializer
-    listener:
+   listener:
       ack-mode: manual
 
-otel:
-  exporter:
-   
-   service:
-     name: hogwarts-artifacts-online
+
 
 
 api:
@@ -22,7 +20,8 @@ api:
     base-url: /api/v1
 management:
   otlp:
-    endpoint: http://localhost:4317
+   tracing: 
+    endpoint: http://localhost:4318/v1/traces
   endpoints:
     web:
      exposure:
