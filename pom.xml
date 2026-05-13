@@ -157,6 +157,11 @@
     <groupId>io.opentelemetry</groupId>
     <artifactId>opentelemetry-exporter-otlp</artifactId>
 </dependency>
+<dependency>
+    <groupId>com.github.loki4j</groupId>
+    <artifactId>loki-logback-appender</artifactId>
+    <version>1.5.2</version>
+</dependency>
 		
 	</dependencies>
 

@@ -58,3 +58,12 @@ services:
        - 4318:4318   # OTLP Http receiver
      depends_on:
        - tempo
+  
+  loki:
+     image: grafana/loki:latest
+     container_name: loki
+     ports:
+      - 3100:3100
+     volumes:
+      - ./docker/loki/loki.yaml:/etc/loki/local-config.yaml
+     command: -config.file=/etc/loki/local-config.yaml
