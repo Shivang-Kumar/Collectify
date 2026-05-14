@@ -12,7 +12,10 @@ spring:
    listener:
       ack-mode: manual
 
-
+logging:
+  level:
+    org.springframework.web: DEBUG
+    edu.tcu.cs.hogwarts_artifacts_online: DEBUG
 
 
 api:

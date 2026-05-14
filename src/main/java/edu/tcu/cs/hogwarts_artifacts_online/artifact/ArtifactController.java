@@ -1,8 +1,10 @@
 package edu.tcu.cs.hogwarts_artifacts_online.artifact;
 
 import java.util.List;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,11 +25,12 @@ import edu.tcu.cs.hogwarts_artifacts_online.system.Result;
 import edu.tcu.cs.hogwarts_artifacts_online.system.StatusCode;
 import io.micrometer.core.instrument.MeterRegistry;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("${api.endpoint.base-url}/artifacts")
+@Slf4j
 public class ArtifactController {
-
 	private final ArtifactService artifactService;
 	private final ArtifactToArtifactDtoConverter artifactDtoConverter;
 	private final ArtifactDtoToArtifactConverter artifactDtoToArtifactConverter;
@@ -44,6 +47,7 @@ public class ArtifactController {
 
 	@GetMapping("/{artifactId}")
 	public Result findArtifactById(@PathVariable String artifactId) {
+		log.info("Fetching artifact with id: {}  ---------------------------------", artifactId);
 		ArtifactDto foundArtifactDto = this.artifactService.findById(artifactId);
 		meterRegistry.counter("artifacd.id."+artifactId).increment();
 		return new Result(true, StatusCode.SUCCESS, "Find one Success", foundArtifactDto);
