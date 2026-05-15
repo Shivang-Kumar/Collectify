@@ -2,7 +2,7 @@ global:
   scrape_interval: 30s
 
 scrape_configs:
-  - job_name: 'spring-boot-app'
+  - job_name: 'collectify'
     metrics_path: '/actuator/prometheus'
     static_configs:
       - targets: ['host.docker.internal:8080']  # Spring Boot is outside Docker This is for demo purpose will change it in production
