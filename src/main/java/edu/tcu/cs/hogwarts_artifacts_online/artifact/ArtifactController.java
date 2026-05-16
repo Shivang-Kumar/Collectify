@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.DTO.ArtifactDto;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.converter.ArtifactDtoToArtifactConverter;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.converter.ArtifactToArtifactDtoConverter;
+import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
 import edu.tcu.cs.hogwarts_artifacts_online.system.Result;
 import edu.tcu.cs.hogwarts_artifacts_online.system.StatusCode;
 import io.micrometer.core.instrument.MeterRegistry;
@@ -54,6 +55,7 @@ public class ArtifactController {
 	}
 
 	@GetMapping
+	@Traced("artifact-controller.findAllArtifacts")
 	public Result findAllArtifact(Pageable pageable) {
 
 		Page<Artifact> foundArtifactsPage = this.artifactService.findAll(pageable);

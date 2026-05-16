@@ -30,6 +30,7 @@ import edu.tcu.cs.hogwarts_artifacts_online.client.ai.chat.dto.ChatRequest;
 import edu.tcu.cs.hogwarts_artifacts_online.client.ai.chat.dto.ChatResponse;
 import edu.tcu.cs.hogwarts_artifacts_online.client.ai.chat.dto.Content;
 import edu.tcu.cs.hogwarts_artifacts_online.client.ai.chat.dto.Part;
+import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
 import edu.tcu.cs.hogwarts_artifacts_online.rediscache.RedisLeaderboardCacheClient;
 import edu.tcu.cs.hogwarts_artifacts_online.system.ObjectNotFoundException;
 import io.micrometer.observation.annotation.Observed;
@@ -126,6 +127,7 @@ public class ArtifactService {
 		return response.getCandidates().get(0).getContent().getParts().get(0).getText();
 	}
 
+	@Traced("artifact-service.findAll")
 	public Page<Artifact> findAll(Pageable pageable) {
 		
 		return this.artifactRepository.findAll(pageable);
