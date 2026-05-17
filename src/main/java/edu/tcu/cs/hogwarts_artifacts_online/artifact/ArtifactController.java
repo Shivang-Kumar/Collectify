@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RestController;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.DTO.ArtifactDto;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.converter.ArtifactDtoToArtifactConverter;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.converter.ArtifactToArtifactDtoConverter;
+import edu.tcu.cs.hogwarts_artifacts_online.notification.logging.Logged;
 import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
 import edu.tcu.cs.hogwarts_artifacts_online.system.Result;
 import edu.tcu.cs.hogwarts_artifacts_online.system.StatusCode;
@@ -47,8 +48,9 @@ public class ArtifactController {
 	}
 
 	@GetMapping("/{artifactId}")
+	@Traced("artifact-controller.findArtifactById")
+	@Logged
 	public Result findArtifactById(@PathVariable String artifactId) {
-		log.info("Fetching artifact with id: {}  ---------------------------------", artifactId);
 		ArtifactDto foundArtifactDto = this.artifactService.findById(artifactId);
 		meterRegistry.counter("artifacd.id."+artifactId).increment();
 		return new Result(true, StatusCode.SUCCESS, "Find one Success", foundArtifactDto);
@@ -56,6 +58,7 @@ public class ArtifactController {
 
 	@GetMapping
 	@Traced("artifact-controller.findAllArtifacts")
+	@Logged
 	public Result findAllArtifact(Pageable pageable) {
 
 		Page<Artifact> foundArtifactsPage = this.artifactService.findAll(pageable);
@@ -66,6 +69,8 @@ public class ArtifactController {
 	}
 
 	@PostMapping
+	@Traced("artifact-controller.addArtifact")
+	@Logged
 	public Result addArtifact(@Valid   @RequestBody ArtifactDto artifactDto) {
 		Artifact newArtifact = this.artifactDtoToArtifactConverter.convert(artifactDto);
 		Artifact savedArtifact = this.artifactService.save(newArtifact);
@@ -74,6 +79,8 @@ public class ArtifactController {
 	}
 	
 	@PutMapping("/{artifactId}")
+	@Traced("artifact-controller.updateArtifact")
+	@Logged
 	public Result updateArtifact( @PathVariable  String artifactId,@Valid @RequestBody ArtifactDto updateArtifactDto) {
 		
 		ArtifactDto updatedArtifactDto=this.artifactService.update(artifactId, updateArtifactDto);
@@ -82,6 +89,8 @@ public class ArtifactController {
 	
 	
 	@DeleteMapping("/{artifactId}")
+	@Traced("artifact-controller.deleteArtifact")
+	@Logged
 	public Result deleteArtifact(@PathVariable String artifactId)
 	{  this.artifactService.delete(artifactId);
 		return new Result(true,StatusCode.SUCCESS,"Delete Success");
@@ -89,6 +98,8 @@ public class ArtifactController {
 	 
 	
 	@GetMapping("/summary")
+	@Traced("artifact-controller.summarizeArtifact")
+	@Logged
     public Result summarizeArtifact() throws Exception {
 		List<Artifact> foundArtifacts=this.artifactService.findAll();
 		
