@@ -30,6 +30,7 @@ import edu.tcu.cs.hogwarts_artifacts_online.client.ai.chat.dto.ChatRequest;
 import edu.tcu.cs.hogwarts_artifacts_online.client.ai.chat.dto.ChatResponse;
 import edu.tcu.cs.hogwarts_artifacts_online.client.ai.chat.dto.Content;
 import edu.tcu.cs.hogwarts_artifacts_online.client.ai.chat.dto.Part;
+import edu.tcu.cs.hogwarts_artifacts_online.notification.logging.Logged;
 import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
 import edu.tcu.cs.hogwarts_artifacts_online.rediscache.RedisLeaderboardCacheClient;
 import edu.tcu.cs.hogwarts_artifacts_online.system.ObjectNotFoundException;
@@ -62,8 +63,9 @@ public class ArtifactService {
 		this.leaderboardCacheClient=redisLeaderboardCacheClient;
 	}
 
-	@Observed(name = "artifact", contextualName = "findByIdService")
+	
 	@Cacheable(value="artifacts",key="#artifactId")
+	@Logged
 	public ArtifactDto findById(String artifactId) {
 		Artifact foundArtifact= this.artifactRepository.findById(artifactId)
 				.orElseThrow(() -> new ObjectNotFoundException("artifact", artifactId));
@@ -72,11 +74,16 @@ public class ArtifactService {
 		
 		return foundArtifactDto;
 	}
-
+	
+	@Traced("artifact-service.findAll")
+	@Logged
 	public List<Artifact> findAll() {
 		return this.artifactRepository.findAll();
 	}
-
+	
+	
+	@Traced("artifact-service.update")
+	@Logged
 	public Artifact save(Artifact newArtifact) {
 
 		newArtifact.setId(idWorker.nextId() + "");
@@ -87,6 +94,8 @@ public class ArtifactService {
 	
 	@Transactional
 	@CachePut(value="artifacts",key="#result.id")
+	@Traced("artifact-service.update")
+	@Logged
 	public ArtifactDto update(String artifactId, @Valid ArtifactDto updateArtifactDto) {
 
 		return this.artifactRepository.findById(artifactId).map(oldArtifact -> {
@@ -105,6 +114,8 @@ public class ArtifactService {
 
 	}
 
+	@Traced("artifact-service.delete")
+	@Logged
 	public void delete(String artifactId) {
 		Artifact artifact = this.artifactRepository.findById(artifactId)
 				.orElseThrow(() -> new ObjectNotFoundException("artifact", artifactId));
@@ -112,6 +123,8 @@ public class ArtifactService {
 
 	}
 
+	@Traced("artifact-service.summarize")
+	@Logged
 	public String summarize(List<ArtifactDto> artifactDtos) throws Exception {
 
 		List<Part> parts = new ArrayList();
@@ -128,6 +141,7 @@ public class ArtifactService {
 	}
 
 	@Traced("artifact-service.findAll")
+	@Logged
 	public Page<Artifact> findAll(Pageable pageable) {
 		
 		return this.artifactRepository.findAll(pageable);
