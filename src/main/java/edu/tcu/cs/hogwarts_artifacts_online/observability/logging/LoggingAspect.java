@@ -1,4 +1,4 @@
-package edu.tcu.cs.hogwarts_artifacts_online.notification.logging;
+package edu.tcu.cs.hogwarts_artifacts_online.observability.logging;
 
 
 import org.aspectj.lang.ProceedingJoinPoint;
