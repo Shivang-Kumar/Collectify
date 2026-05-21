@@ -7,6 +7,7 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import edu.tcu.cs.hogwarts_artifacts_online.observability.metrics.AuthMetrics;
 import edu.tcu.cs.hogwarts_artifacts_online.rediscache.RedisCacheClient;
 import edu.tcu.cs.hogwarts_artifacts_online.user.MyUserPrincipal;
 import edu.tcu.cs.hogwarts_artifacts_online.user.User;
@@ -20,14 +21,17 @@ public class AuthService {
 	
 	private final UserToUserDtoConverter userToUserDtoConverter;
 	
+	private final AuthMetrics authMetrics;
+	
 	private final RedisCacheClient redisCacheClient;
 	
 
-	public AuthService(JWTProvider jwtProvider,RedisCacheClient redisCacheClient) {
+	public AuthService(JWTProvider jwtProvider,RedisCacheClient redisCacheClient,AuthMetrics authMetrics) {
 		super();
 		this.jwtProvider = jwtProvider;
 		this.userToUserDtoConverter = new UserToUserDtoConverter();
 		this.redisCacheClient=redisCacheClient;
+		this.authMetrics=authMetrics;
 	}
 
 	public Map<String,Object> createLoginInfo(Authentication authentication) {
@@ -46,6 +50,10 @@ public class AuthService {
 		Map<String,Object> loginResultMap=new HashMap<>();
 		loginResultMap.put("userInfo",userDto);
 		loginResultMap.put("token", token);
+		
+		
+		//Incrementing the counter
+		authMetrics.incrementSuccessCounter();
 		return loginResultMap;
 		
 	}

@@ -8,6 +8,7 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import edu.tcu.cs.hogwarts_artifacts_online.observability.metrics.AuthMetrics;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -18,11 +19,13 @@ public class CustomBasicAuthenticationEntryPoint implements AuthenticationEntryP
 	//This class is used because security exception occurs before hitting controllers thus RestControllerAdvice cannot be used so we create our own authentication entry point.
 	
 	private final HandlerExceptionResolver resolver;
+	private final AuthMetrics authMetrics;
 	
 	
-	public CustomBasicAuthenticationEntryPoint(@Qualifier("handlerExceptionResolver")HandlerExceptionResolver resolver) {
+	public CustomBasicAuthenticationEntryPoint(@Qualifier("handlerExceptionResolver")HandlerExceptionResolver resolver,AuthMetrics authMetrics) {
 		super();
 		this.resolver = resolver;
+		this.authMetrics=authMetrics;
 	}
 
 
@@ -30,8 +33,8 @@ public class CustomBasicAuthenticationEntryPoint implements AuthenticationEntryP
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
       response.addHeader("WWW-Authenticate", "Basic realm=\"Realm\""); 
+      authMetrics.incrementFailureCounter();
       this.resolver.resolveException(request, response, null, authException);
-		
 	}
 
 }
