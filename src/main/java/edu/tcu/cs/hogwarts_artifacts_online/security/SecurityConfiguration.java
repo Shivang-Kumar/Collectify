@@ -32,6 +32,9 @@ import com.nimbusds.jose.jwk.source.ImmutableJWKSet;
 import com.nimbusds.jose.jwk.source.JWKSource;
 import com.nimbusds.jose.proc.SecurityContext;
 
+import edu.tcu.cs.hogwarts_artifacts_online.observability.logging.Logged;
+import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
+
 @Configuration
 public class SecurityConfiguration {
 
@@ -65,6 +68,8 @@ public class SecurityConfiguration {
 	private String baseUrl;
 
 	@Bean
+	@Traced("SecurityConfiguration.securityFilterChain")
+	@Logged
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
 				.authorizeHttpRequests(authorizeHttpRequest -> authorizeHttpRequest
@@ -95,11 +100,15 @@ public class SecurityConfiguration {
 	}
 
 	@Bean
+	@Traced("SecurityConfiguration.passwordEncoder")
+	@Logged
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder(12);
 	}
 
 	@Bean
+	@Traced("SecurityConfiguration.jwtEncoder")
+	@Logged
 	JwtEncoder jwtEncoder() {
 		JWK jwk = new RSAKey.Builder(this.publicKey).privateKey(this.privateKey).build();
 		JWKSource<SecurityContext> jwkSet = new ImmutableJWKSet<>(new JWKSet(jwk));
@@ -107,11 +116,15 @@ public class SecurityConfiguration {
 	}
 
 	@Bean
+	@Traced("SecurityConfiguration.jwtDecoder")
+	@Logged
 	JwtDecoder jwtDecoder() {
 		return NimbusJwtDecoder.withPublicKey(this.publicKey).build();
 	}
 
 	@Bean
+	@Traced("SecurityConfiguration.jwtAuthenticationConverter")
+	@Logged
 	JwtAuthenticationConverter jwtAuthenticationConverter() {
 		JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
 		jwtGrantedAuthoritiesConverter.setAuthoritiesClaimName("authorities");

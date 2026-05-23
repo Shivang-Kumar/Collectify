@@ -7,7 +7,9 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
+import edu.tcu.cs.hogwarts_artifacts_online.observability.logging.Logged;
 import edu.tcu.cs.hogwarts_artifacts_online.observability.metrics.AuthMetrics;
+import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
 import edu.tcu.cs.hogwarts_artifacts_online.rediscache.RedisCacheClient;
 import edu.tcu.cs.hogwarts_artifacts_online.user.MyUserPrincipal;
 import edu.tcu.cs.hogwarts_artifacts_online.user.User;
@@ -34,6 +36,8 @@ public class AuthService {
 		this.authMetrics=authMetrics;
 	}
 
+	@Traced("authService.createLoginInfo")
+	@Logged
 	public Map<String,Object> createLoginInfo(Authentication authentication) {
 		//Create User info object
 		MyUserPrincipal principal=(MyUserPrincipal) authentication.getPrincipal();

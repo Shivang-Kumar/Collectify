@@ -27,8 +27,8 @@ import static org.mockito.Mockito.when;
 
 import edu.tcu.cs.hogwarts_artifacts_online.Owner.Owner;
 import edu.tcu.cs.hogwarts_artifacts_online.OwnerDto.dto.OwnerDto;
-import edu.tcu.cs.hogwarts_artifacts_online.artifact.DTO.ArtifactDto;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.converter.ArtifactToArtifactDtoConverter;
+import edu.tcu.cs.hogwarts_artifacts_online.artifact.dto.ArtifactDto;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.utils.IdWorker;
 import edu.tcu.cs.hogwarts_artifacts_online.client.ai.chat.ChatClient;
 import edu.tcu.cs.hogwarts_artifacts_online.client.ai.chat.dto.Candidate;

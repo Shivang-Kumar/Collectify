@@ -25,6 +25,8 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.tcu.cs.hogwarts_artifacts_online.observability.logging.Logged;
+import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
 import edu.tcu.cs.hogwarts_artifacts_online.system.ObjectNotFoundException;
 import edu.tcu.cs.hogwarts_artifacts_online.system.Result;
 import edu.tcu.cs.hogwarts_artifacts_online.system.StatusCode;
@@ -34,12 +36,16 @@ public class ExceptionHandlerAdvice {
 
 	@ExceptionHandler(ObjectNotFoundException.class)
 	@ResponseStatus(HttpStatus.NOT_FOUND)
+	@Traced("ExceptionHandlerAdvice.handleObjectNotFoundException")
+	@Logged
 	Result handleObjectNotFoundException(ObjectNotFoundException ex) {
 		return new Result(false, StatusCode.NOT_FOUND, ex.getMessage());
 	}
 
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@Traced("ExceptionHandlerAdvice.handleValidationException")
+	@Logged
 	Result handleValidationException(MethodArgumentNotValidException ex) {
 		List<ObjectError> errors = ex.getBindingResult().getAllErrors();
 		Map<String, String> map = new HashMap<>(errors.size());
@@ -54,25 +60,32 @@ public class ExceptionHandlerAdvice {
 
 	@ExceptionHandler({ InsufficientAuthenticationException.class })
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	@Traced("ExceptionHandlerAdvice.handleInsufficientAuthenticationException")
+	@Logged
 	Result handleInsufficientAuthenticationException(InsufficientAuthenticationException ex) {
 		return new Result(false, StatusCode.UNAUTHORIZED, "Log in credentials are missing", ex.getMessage());
 	}
 
 	@ExceptionHandler({ UsernameNotFoundException.class, BadCredentialsException.class })
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	@Traced("ExceptionHandlerAdvice.handleAuthenticationException")
+	@Logged
 	Result handleAuthenticationException(Exception ex) {
 		return new Result(false, StatusCode.UNAUTHORIZED, "username or password is incorrect", ex.getMessage());
 	}
 
 	@ExceptionHandler({ AccountStatusException.class })
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	@Traced("ExceptionHandlerAdvice.handlAccountStatusException")
+	@Logged
 	Result handlAccountStatusException(AccountStatusException ex) {
 		return new Result(false, StatusCode.UNAUTHORIZED, "User account is abnormal", ex.getMessage());
 	}
 
 	// Related t open API exception
 	@ExceptionHandler({HttpClientErrorException.class, HttpStatusCodeException.class})
-
+	@Traced("ExceptionHandlerAdvice.handlRestClientExceptionException")
+	@Logged
 	ResponseEntity<Result> handlRestClientExceptionException(HttpStatusCodeException ex)
 	{
 		String errorResponse = ex.getResponseBodyAsString();
@@ -97,6 +110,8 @@ public class ExceptionHandlerAdvice {
 	
 	@ExceptionHandler({InvalidBearerTokenException.class})
 	@ResponseStatus(HttpStatus.UNAUTHORIZED)
+	@Traced("ExceptionHandlerAdvice.handleInvalidBearerTokenException")
+	@Logged
 	Result handleInvalidBearerTokenException(InvalidBearerTokenException ex)
 	{
 		return new Result(false,StatusCode.UNAUTHORIZED,"The access token provided is expired, revoked , malformed or invalid for other reasons.",ex.getMessage());
@@ -104,6 +119,8 @@ public class ExceptionHandlerAdvice {
 
 	@ExceptionHandler({ AccessDeniedException.class })
 	@ResponseStatus(HttpStatus.FORBIDDEN)
+	@Traced("ExceptionHandlerAdvice.handleAccessDeniedException")
+	@Logged
 	Result handleAccessDeniedException(AccessDeniedException ex) {
 		return new Result(false, StatusCode.FORBIDDEN, "No permission.", ex.getMessage());
 	}
@@ -111,6 +128,8 @@ public class ExceptionHandlerAdvice {
 	
 	@ExceptionHandler({PasswordChangeIllegalArgumentException.class})
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@Traced("ExceptionHandlerAdvice.handlePasswordChangeIllegalArgumentException")
+	@Logged
 	public Result handlePasswordChangeIllegalArgumentException(PasswordChangeIllegalArgumentException ex)
 	{
 		return new Result(false,StatusCode.INVALID_ARGUMENT,ex.getMessage());
@@ -121,6 +140,8 @@ public class ExceptionHandlerAdvice {
 
 	@ExceptionHandler({ Exception.class })
 	@ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
+	@Traced("ExceptionHandlerAdvice.handleOtherException")
+	@Logged
 	Result handleOtherException(Exception ex) {
 		return new Result(false, StatusCode.INTERNAL_SERVER_ERROR, "A server internal error occurs.", ex.getMessage());
 	}

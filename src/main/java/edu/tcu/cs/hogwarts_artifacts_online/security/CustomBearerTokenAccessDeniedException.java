@@ -8,6 +8,8 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import edu.tcu.cs.hogwarts_artifacts_online.observability.logging.Logged;
+import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -26,6 +28,8 @@ public class CustomBearerTokenAccessDeniedException implements AccessDeniedHandl
 	}
 
 	@Override
+	@Traced("CustomBearerTokenAccessDeniedException.handle")
+	@Logged
 	public void handle(HttpServletRequest request, HttpServletResponse response,
 			AccessDeniedException accessDeniedException) throws IOException, ServletException {
 		this.resolver.resolveException(request, response, null, accessDeniedException);

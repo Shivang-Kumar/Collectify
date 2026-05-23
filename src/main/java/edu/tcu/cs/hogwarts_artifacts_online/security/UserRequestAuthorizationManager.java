@@ -11,12 +11,17 @@ import org.springframework.security.web.access.intercept.RequestAuthorizationCon
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.UriTemplate;
 
+import edu.tcu.cs.hogwarts_artifacts_online.observability.logging.Logged;
+import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
+
 @Component
 public class UserRequestAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext>{
 
 	
 	private static final UriTemplate USER_URI_TEMPLATE=new UriTemplate("/users/{userId}");
 	@Override
+	@Traced("UserRequestAuthorizationManager.check")
+	@Logged
 	public AuthorizationDecision check(Supplier<Authentication> authenticationSupplier, RequestAuthorizationContext context) {
 		
 		//Extract the userID from the request URI

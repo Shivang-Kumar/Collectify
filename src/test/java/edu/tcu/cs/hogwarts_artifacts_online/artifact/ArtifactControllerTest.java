@@ -36,8 +36,8 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 
-import edu.tcu.cs.hogwarts_artifacts_online.artifact.DTO.ArtifactDto;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.converter.ArtifactToArtifactDtoConverter;
+import edu.tcu.cs.hogwarts_artifacts_online.artifact.dto.ArtifactDto;
 import edu.tcu.cs.hogwarts_artifacts_online.system.ObjectNotFoundException;
 import edu.tcu.cs.hogwarts_artifacts_online.system.StatusCode;
 

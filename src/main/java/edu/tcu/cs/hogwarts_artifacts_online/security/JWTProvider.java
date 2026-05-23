@@ -10,6 +10,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
 
+import edu.tcu.cs.hogwarts_artifacts_online.observability.logging.Logged;
+import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
 import edu.tcu.cs.hogwarts_artifacts_online.user.MyUserPrincipal;
 
 @Component
@@ -23,6 +25,8 @@ public class JWTProvider {
 	}
 
 
+	@Traced("JWTProvider.createToken")
+	@Logged
 	public String createToken(Authentication authentication) {
 		Instant now=Instant.now();
 		long expiresIn=2; // 2 hours

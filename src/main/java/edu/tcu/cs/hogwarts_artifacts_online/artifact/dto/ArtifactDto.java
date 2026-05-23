@@ -1,4 +1,4 @@
-package edu.tcu.cs.hogwarts_artifacts_online.artifact.DTO;
+package edu.tcu.cs.hogwarts_artifacts_online.artifact.dto;
 
 import java.io.Serializable;
 

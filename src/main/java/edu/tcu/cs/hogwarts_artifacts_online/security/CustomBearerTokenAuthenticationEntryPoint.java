@@ -8,7 +8,9 @@ import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
+import edu.tcu.cs.hogwarts_artifacts_online.observability.logging.Logged;
 import edu.tcu.cs.hogwarts_artifacts_online.observability.metrics.AuthMetrics;
+import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -29,6 +31,8 @@ public class CustomBearerTokenAuthenticationEntryPoint implements Authentication
 	}
 
 	@Override
+	@Traced("CustomBearerTokenAuthenticationEntryPoint.commence")
+	@Logged
 	public void commence(HttpServletRequest request, HttpServletResponse response,
 			AuthenticationException authException) throws IOException, ServletException {
 		authMetrics.incrementTokenFailureCounter();

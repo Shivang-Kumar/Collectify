@@ -7,6 +7,8 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 
+import edu.tcu.cs.hogwarts_artifacts_online.observability.logging.Logged;
+import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
 import edu.tcu.cs.hogwarts_artifacts_online.rediscache.RedisCacheClient;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -25,10 +27,11 @@ public class JwtInterceptor  implements HandlerInterceptor{
 
 
 	@Override
+	@Traced("JwtInterceptor.preHandle")
+	@Logged
 	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
 			throws Exception {
 		
-		//Get the token from the request header
 		
 		String authorizationHeader=request.getHeader("Authorization");
 		//If token is not null and starts with "Bearer " , then we need to verify if this token is present in redis

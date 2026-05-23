@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import edu.tcu.cs.hogwarts_artifacts_online.observability.logging.Logged;
 import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
 import edu.tcu.cs.hogwarts_artifacts_online.system.Result;
 import edu.tcu.cs.hogwarts_artifacts_online.system.StatusCode;
@@ -30,6 +31,8 @@ public class AuthController {
 
 	
 	@PostMapping("/login")
+	@Traced("authController.getLoginInfo")
+	@Logged
 	public Result getLoginInfo(Authentication authentication) {
 		LOGGER.debug("Authenticated User: '{}'",authentication.getName());
 		System.out.println(authentication);
