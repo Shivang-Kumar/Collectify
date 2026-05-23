@@ -18,6 +18,8 @@ import edu.tcu.cs.hogwarts_artifacts_online.artifact.Artifact;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.ArtifactRepository;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.utils.CommonUtils;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.utils.IdWorker;
+import edu.tcu.cs.hogwarts_artifacts_online.observability.logging.Logged;
+import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
 import edu.tcu.cs.hogwarts_artifacts_online.rediscache.RedisLeaderboardCacheClient;
 import edu.tcu.cs.hogwarts_artifacts_online.system.ObjectNotFoundException;
 
@@ -40,23 +42,28 @@ public class OwnerService {
 		this.ownerToOwnerDtoConverter=ownerToOwnerDtoConverter;
 	}
 
+	@Traced("owner-service.findAll")
+	@Logged
 	public List<Owner> findAll() {
 		List<Owner> owners = ownerRepository.findAll();
 		return owners;
 	}
-
+	@Traced("owner-service.save")
+	@Logged
 	public Owner save(Owner owner) {
 		owner.setId((int) idWorker.nextId());
 		return ownerRepository.save(owner);
 	}
-
+	@Traced("owner-service.findById")
+	@Logged
 	public Owner findById(Integer ownerId) {
 		Owner foundOwner = this.ownerRepository.findById(ownerId)
 				.orElseThrow(() -> new ObjectNotFoundException("owner", ownerId));
 
 		return foundOwner;
 	}
-
+	@Traced("owner-service.updateOwner")
+	@Logged
 	public Owner updateOwner(Integer ownerId, Owner owner) {
 		Owner updatedOwner = this.ownerRepository.findById(ownerId).map(foundOwner -> {
 			foundOwner.setName(owner.getName());
@@ -65,7 +72,8 @@ public class OwnerService {
 
 		return updatedOwner;
 	}
-
+	@Traced("owner-service.deleteOwnerById")
+	@Logged
 	public void deleteOwnerById(int ownerId) {
 		Owner foundOwner = this.ownerRepository.findById(ownerId)
 				.orElseThrow(() -> new ObjectNotFoundException("owner", ownerId));
@@ -74,7 +82,8 @@ public class OwnerService {
 		foundOwner.removeAllArtifacts();
 		this.ownerRepository.deleteById(ownerId);
 	}
-
+	@Traced("owner-service.assignArtifactToOwner")
+	@Logged
 	public void assignArtifactToOwner(String artifactID, Integer ownerId) {
 
 		Owner foundOwner = this.ownerRepository.findById(ownerId)
@@ -87,7 +96,8 @@ public class OwnerService {
 		ownerRepository.save(foundOwner);
 		artifactRepository.save(foundArtifact);
 	}
-	
+	@Traced("owner-service.assignArtifact")
+	@Logged
 	public void assignArtifact(Integer ownerId,String artifactId)
 	{
 		Artifact foundArtifact=this.artifactRepository.findById(artifactId).orElseThrow(() -> new ObjectNotFoundException("artifact", artifactId));
@@ -105,7 +115,8 @@ public class OwnerService {
 		
 		
 	}
-
+	@Traced("owner-service.getLeaderboard")
+	@Logged
 	public List<Object> getLeaderboard(String entityType, String property, int limit) {
 
 		boolean checkedKey=this.leaderboardCacheClient.hasKey(entityType, property);
@@ -139,6 +150,8 @@ public class OwnerService {
 		).collect(Collectors.toList());
 	}
 
+	@Traced("owner-service.getOwnerRank")
+	@Logged
 	public long getOwnerRank(String entityType, String property, String ownerId) {
 		return this.leaderboardCacheClient.getEntityRank(entityType, property, ownerId);
 	}

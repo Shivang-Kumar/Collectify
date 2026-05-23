@@ -32,7 +32,7 @@ import edu.tcu.cs.hogwarts_artifacts_online.Owner.Owner;
 import edu.tcu.cs.hogwarts_artifacts_online.Owner.OwnerService;
 import edu.tcu.cs.hogwarts_artifacts_online.OwnerDto.dto.OwnerDto;
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.Artifact;
-import edu.tcu.cs.hogwarts_artifacts_online.artifact.DTO.ArtifactDto;
+import edu.tcu.cs.hogwarts_artifacts_online.artifact.dto.ArtifactDto;
 import edu.tcu.cs.hogwarts_artifacts_online.system.ObjectNotFoundException;
 import edu.tcu.cs.hogwarts_artifacts_online.system.StatusCode;
 

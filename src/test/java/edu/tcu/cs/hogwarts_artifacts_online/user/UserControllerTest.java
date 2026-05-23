@@ -26,7 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.tcu.cs.hogwarts_artifacts_online.artifact.Artifact;
-import edu.tcu.cs.hogwarts_artifacts_online.artifact.DTO.ArtifactDto;
+import edu.tcu.cs.hogwarts_artifacts_online.artifact.dto.ArtifactDto;
 import edu.tcu.cs.hogwarts_artifacts_online.system.ObjectNotFoundException;
 import edu.tcu.cs.hogwarts_artifacts_online.system.StatusCode;
 import edu.tcu.cs.hogwarts_artifacts_online.user.DTO.UserDto;

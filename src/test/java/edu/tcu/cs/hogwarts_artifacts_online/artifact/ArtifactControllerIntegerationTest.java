@@ -33,7 +33,7 @@ import org.testcontainers.utility.DockerImageName;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.redis.testcontainers.RedisContainer;
 
-import edu.tcu.cs.hogwarts_artifacts_online.artifact.DTO.ArtifactDto;
+import edu.tcu.cs.hogwarts_artifacts_online.artifact.dto.ArtifactDto;
 import edu.tcu.cs.hogwarts_artifacts_online.system.StatusCode;
 
 @SpringBootTest
