@@ -77,7 +77,7 @@ This application implements the **three pillars of observability** — Traces, M
 ---
 
 ### Stack
-
+```
 | Component ----------> Purpose 
 | OpenTelemetry Collector --------------> Vendor-agnostic trace pipeline 
 | Grafana Tempo ----->  Distributed trace storage 
@@ -85,7 +85,7 @@ This application implements the **three pillars of observability** — Traces, M
 | Grafana Loki ----------> Log aggregation 
 | Grafana -------------->  Unified visualization dashboard 
 | Micrometer ------------>   Metrics and tracing facade 
-
+```
 ---
 
 ### Distributed Tracing
@@ -175,13 +175,13 @@ Start the full observability stack using Docker Compose:
 ```bash
 docker compose up -d
 ```
-
+```
 | Service  ------->  URL 
 | Grafana -------> http://localhost:3000 
 | Prometheus ------> http://localhost:9090 
 | Grafana Tempo -----> http://localhost:3200 
 | Grafana Loki ---->  http://localhost:3100 
-
+```
 
 
 ---
