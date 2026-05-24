@@ -67,11 +67,12 @@ This application implements the **three pillars of observability** — Traces, M
 ---
 
 ### Architecture
-Spring Boot Application
+```Spring Boot Application
 │
 ├── Traces  ──► OTel Collector ──► Grafana Tempo ──► Grafana
 ├── Metrics ──► Prometheus ──────────────────────► Grafana
 └── Logs    ──► Loki ───────────────────────────► Grafana
+```
 
 ---
 
