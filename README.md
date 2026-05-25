@@ -1,5 +1,3 @@
-Spring Boot Project
-
 A Spring Boot application designed to provide a robust starting point for building Java-based backend services. This project follows standard Spring Boot architecture and encourages modular, clean, and maintainable code.
 
 
@@ -65,7 +63,7 @@ src/
 
 ## 🎥 Demo Video
 
-[![Watch Demo](docs/images/image.png)](https://drive.google.com/file/d/1tLSsnLHn7KoqGHjXV2kga15OTQnIPhpz/view?usp=sharing)
+[![Watch Demo](docs/images/collectify-observability-demo.png)](https://drive.google.com/file/d/1tLSsnLHn7KoqGHjXV2kga15OTQnIPhpz/view?usp=sharing)
 
 This application implements the **three pillars of observability** — Traces, Metrics, and Logs — using industry-standard tools and the **LGTM stack** (Loki, Grafana, Tempo, Micrometer/Prometheus).
 
