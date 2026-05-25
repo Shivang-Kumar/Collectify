@@ -62,6 +62,11 @@ src/
 
 ## Observability
 
+
+## 🎥 Demo Video
+
+[![Watch Demo](docs/images/image.png)](https://drive.google.com/file/d/1tLSsnLHn7KoqGHjXV2kga15OTQnIPhpz/view?usp=sharing)
+
 This application implements the **three pillars of observability** — Traces, Metrics, and Logs — using industry-standard tools and the **LGTM stack** (Loki, Grafana, Tempo, Micrometer/Prometheus).
 
 ---
