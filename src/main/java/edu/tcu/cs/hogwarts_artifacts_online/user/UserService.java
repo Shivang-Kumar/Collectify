@@ -19,6 +19,8 @@ import org.springframework.stereotype.Service;
 import edu.tcu.cs.hogwarts_artifacts_online.notification.Notification;
 import edu.tcu.cs.hogwarts_artifacts_online.notification.NotificationChannel;
 import edu.tcu.cs.hogwarts_artifacts_online.notification.NotificationEventPublisher;
+import edu.tcu.cs.hogwarts_artifacts_online.observability.logging.Logged;
+import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
 import edu.tcu.cs.hogwarts_artifacts_online.rediscache.RedisCacheClient;
 import edu.tcu.cs.hogwarts_artifacts_online.system.ObjectNotFoundException;
 import edu.tcu.cs.hogwarts_artifacts_online.system.exception.PasswordChangeIllegalArgumentException;
@@ -42,12 +44,16 @@ public class UserService implements UserDetailsService {
 	}
 
 
+	@Traced("user-service.findAllUser")
+	@Logged
 	public List<User> findAllUser(){
 		List<User> allUsers=this.userRepository.findAll();
 		return allUsers;
 	}
 
 
+	@Traced("user-service.addUser")
+	@Logged
 	public User addUser(User user) {
 		user.setPassword(this.passwordEncoder.encode(user.getPassword()));
 		User savedUser=this.userRepository.save(user);
@@ -57,6 +63,8 @@ public class UserService implements UserDetailsService {
 
 	}
 	
+	@Traced("user-service.findUserById")
+	@Logged
 	public User findUserById(Integer id)
 	{
 		User foundUser=this.userRepository.findById(id).orElseThrow(() -> new ObjectNotFoundException("user", id));
@@ -64,6 +72,8 @@ public class UserService implements UserDetailsService {
 	}
 
 
+	@Traced("user-service.updateUser")
+	@Logged
 	public User updateUser(Integer userId,User user) {
 	User foundUser=this.userRepository.findById(userId).orElseThrow(() ->  new ObjectNotFoundException("user", userId));
 	
@@ -80,7 +90,8 @@ public class UserService implements UserDetailsService {
 	return this.userRepository.save(foundUser);
 	}
 
-
+	@Traced("user-service.deleteUserById")
+	@Logged
 	public void deleteUserById(Integer userId) {
 		
 		User user=this.userRepository.findById(userId).orElseThrow(() -> new ObjectNotFoundException("user", userId));
@@ -88,6 +99,8 @@ public class UserService implements UserDetailsService {
 	}
 
 
+	@Traced("user-service.loadUserByUsername")
+	@Logged
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 	return this.userRepository.findByUsername(username)
