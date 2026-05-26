@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import edu.tcu.cs.hogwarts_artifacts_online.observability.logging.Logged;
+import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
 import edu.tcu.cs.hogwarts_artifacts_online.system.Result;
 import edu.tcu.cs.hogwarts_artifacts_online.system.StatusCode;
 import edu.tcu.cs.hogwarts_artifacts_online.user.DTO.UserDto;
@@ -42,6 +44,8 @@ public class UserController {
 	UserDtoToUserConverter userDtoToUserConverter;
 
 	@GetMapping
+	@Traced("user-controller.findAllUser")
+	@Logged
 	public Result findAllUser() {
 
 		List<User> allUsers = this.userService.findAllUser();
@@ -52,6 +56,8 @@ public class UserController {
 	}
 
 	@PostMapping
+	@Traced("user-controller.addUser")
+	@Logged
 	public Result addUser(@Validated(CreateGroup.class) @RequestBody UserDto userDto) {
 		User user = userDtoToUserConverter.convert(userDto);
 		User savedUser = userService.addUser(user);
@@ -61,6 +67,8 @@ public class UserController {
 	}
 	
 	@GetMapping("/{userId}")
+	@Traced("user-controller.findUserById")
+	@Logged
 	public Result findUserById(@PathVariable Integer userId) {
 		User user=this.userService.findUserById(userId);
 		UserDto userDto=this.userToUserDtoConverter.convert(user);
@@ -69,6 +77,8 @@ public class UserController {
 	}
 	
 	@PutMapping("/{userId}")
+	@Traced("user-controller.updateUser")
+	@Logged
 	public Result updateUser(@PathVariable Integer userId,@Validated(UpdateGroup.class) @RequestBody UserDto newUserDto)
 	{
 		User newUser=userDtoToUserConverter.convert(newUserDto);
@@ -78,6 +88,8 @@ public class UserController {
 	}
 	
 	@DeleteMapping("/{userId}")
+	@Traced("user-controller.deleteUserById")
+	@Logged
 	public Result deleteUserById(@PathVariable Integer userId) {
 		this.userService.deleteUserById(userId);
 		return new Result(true,StatusCode.SUCCESS,"Delete Success");
@@ -85,6 +97,8 @@ public class UserController {
 	
 	
 	@PostMapping("/request-otp/{username}")
+	@Traced("user-controller.getOtp")
+	@Logged
 	public Result getOtp(@PathVariable String username)
 	{
 		String otp=this.userService.generateOtp(username);
@@ -92,6 +106,8 @@ public class UserController {
 	}
 	
 	@PostMapping("/verify-otp/{username}/{otp}")
+	@Traced("user-controller.verifyOtp")
+	@Logged
 	public Result verifyOtp(@PathVariable String username,@PathVariable String otp)
 	{
 		String  resetTokenKey=this.userService.verifyOtp(username,otp);
@@ -102,6 +118,8 @@ public class UserController {
 	
 	
 	@PatchMapping("/{userId}/logged-in-password-change")
+	@Traced("user-controller.changePassword")
+	@Logged
 	public Result changePassword(@PathVariable Integer userId, @RequestBody Map<String,String> passwordMap)
 	{
 		String oldPassword=passwordMap.get("oldPassword");
@@ -112,6 +130,8 @@ public class UserController {
 	}
 	
 	@PatchMapping("/{userId}/non-logged-in-password-change")
+	@Traced("user-controller.changePasswordByOtp")
+	@Logged
 	public Result changePasswordByOtp(@PathVariable Integer userId, @RequestBody Map<String, String> request) {
 
 	    String newPassword = request.get("newPassword");
