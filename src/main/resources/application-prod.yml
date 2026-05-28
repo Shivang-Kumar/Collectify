@@ -1,12 +1,56 @@
 spring:
   datasource:
-    url: ${datasource-url}  
-    username: ${datasource-username}   #url of mysql in railway
-    password: ${datasource-password}   #password of mysql in railway
+    url: ${DB_URL}                        # jdbc:mysql://localhost:3306/collectify_prod
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10              # Connection pool — don't overwhelm DB
+      minimum-idle: 2
+      connection-timeout: 30000
+
   jpa:
     hibernate:
-      ddl-auto: none #Turning off ddl auto generation
+      ddl-auto: validate                 # NEVER use update/create in prod — validate only
+    show-sql: false                      # Never log SQL in prod — performance + data leak risk
 
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS}   # e.g. localhost:9092 or MSK endpoint
+
+  data:
+    redis:
+      host: ${REDIS_HOST}               # e.g. localhost or ElastiCache endpoint
+      port: ${REDIS_PORT:6379}          # defaults to 6379 if not set
+
+# JWT secret from env — never hardcode
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION:3600}
+
+logging:
+  level:
+    root: WARN                           # Only warnings and errors in prod
+    edu.tcu.cs.hogwarts_artifacts_online: INFO  # Your app logs at INFO level
+
+management:
+  otlp:
+    tracing:
+      endpoint: ${OTLP_ENDPOINT}        # Your observability backend endpoint
+  tracing:
+    sampling:
+      probability: 0.1                  # Only trace 10% of requests in prod
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus   # Only expose what's needed
+  endpoint:
+    health:
+      show-details: never               # Never expose internal health details publicly
+
+server:
+  error:
+    include-stacktrace: never           # Never send stack traces to clients
+    include-message: never
 ai:
 geminiai:
   endpoint: ${AI_GEMINIAI_ENDPOINT:https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent}

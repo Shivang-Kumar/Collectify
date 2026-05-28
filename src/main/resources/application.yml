@@ -1,39 +1,21 @@
 spring:
   application:
    name: collectify   
-  profiles:
-    active: dev
+
  
   kafka:
-   bootstrap-servers: localhost:9092
    producer:
     value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
     key-serializer: org.apache.kafka.common.serialization.StringSerializer
    listener:
       ack-mode: manual
 
-logging:
-  level:
-    org.springframework.web: DEBUG
-    edu.tcu.cs.hogwarts_artifacts_online: DEBUG
-
 
 api:
   endpoint:
     base-url: /api/v1
+
 management:
-  otlp:
-   tracing: 
-    endpoint: http://localhost:4318/v1/traces
-  endpoints:
-    web:
-     exposure:
-       include: health,info, metrics,env,beans,configprops,heapdump, httpexchanges,loggers,mappings,custom-beans ,prometheus
-  endpoint:
-    health:
-      show-details: always
-      probes:
-        enabled: true
   info:
     build:
       enabled: true
@@ -42,14 +24,12 @@ management:
     git:
       enabled: true
       mode: full
-
     java:
       enabled: true
     os:
       enabled: true
-  tracing:
-   sampling:
-      probability: 1 #Only for demo purpose change it back to 0.1 in production 
+
+
 info:
   app:
     name: hogwarts-artifact-online
