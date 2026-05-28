@@ -5,11 +5,42 @@ spring:
     password:
     driver-class-name: org.h2.Driver
   jpa:
+   hibernate:
+     ddl-auto: update
    show-sql: true
+  kafka:
+    bootstrap-servers: localhost:9092
+
   data:
     redis:
       host: localhost
       port: 6379
+
+
+
+logging:
+ level:
+   org.springframework.web: DEBUG
+
+
+management:
+    otlp:
+      tracing: 
+        endpoint: http://localhost:4318/v1/traces
+    tracing:
+      sampling:
+        probability: 1
+
+    endpoints:
+      web:
+       exposure:
+         include: health,info, metrics,env,beans,configprops,heapdump, httpexchanges,loggers,mappings,custom-beans ,prometheus
+    endpoint:
+       health:
+        show-details: always
+
+
+
 
 ai:
   geminiai:
