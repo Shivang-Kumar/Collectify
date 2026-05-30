@@ -5,10 +5,28 @@ networks:
     driver: bridge
 
 
-
+volumes:
+  mysql-data:
 
 services:
-  
+  mysql:
+     image: mysql:8
+     container_name: mysql
+     ports:
+        - "127.0.0.1:3309:3306"
+     networks:
+       - collectify-network
+     environment:
+       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD}
+       MYSQL_DATABASE: collectify_prod
+       MYSQL_USER: ${DB_USERNAME}
+       MYSQL_PASSWORD: ${DB_PASSWORD}
+     volumes:
+       - mysql-data:/var/lib/mysql
+     restart: unless-stopped
+     mem_limit: 512m 
+
+
   app:
    build: .
    container_name: collectify
