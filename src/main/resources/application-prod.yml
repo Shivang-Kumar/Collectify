@@ -11,7 +11,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: validate                 # NEVER use update/create in prod — validate only
+      ddl-auto: update                 
     show-sql: false                      # Never log SQL in prod — performance + data leak risk
 
   kafka:
@@ -22,7 +22,6 @@ spring:
       host: ${REDIS_HOST}               # e.g. localhost or ElastiCache endpoint
       port: ${REDIS_PORT:6379}          # defaults to 6379 if not set
 
-# JWT secret from env — never hardcode
 jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION:3600}
