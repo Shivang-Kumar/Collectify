@@ -44,6 +44,6 @@ management:
 
 ai:
   geminiai:
-    endpoint: ${AI_GEMINIAI_ENDPOINT:https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent}
-    api-key: ${AI_GEMINIAI_API_KEY:YOUR_API_KEY}
+    endpoint: ${AI_GEMINIAI_ENDPOINT:-https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent}
+    api-key: ${AI_GEMINIAI_API_KEY:-YOUR_API_KEY}
 
