@@ -1,4 +1,4 @@
-docspring:
+spring:
   application:
    name: collectify   
 
