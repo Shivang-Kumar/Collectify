@@ -13,6 +13,7 @@ import edu.tcu.cs.hogwarts_artifacts_online.observability.logging.Logged;
 import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
 import edu.tcu.cs.hogwarts_artifacts_online.system.Result;
 import edu.tcu.cs.hogwarts_artifacts_online.system.StatusCode;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 
 @RestController
 @RequestMapping("${api.endpoint.base-url}/users")
@@ -30,6 +31,7 @@ public class AuthController {
 
 
 	
+	@SecurityRequirement(name = "basicAuth")
 	@PostMapping("/login")
 	@Traced("authController.getLoginInfo")
 	@Logged
