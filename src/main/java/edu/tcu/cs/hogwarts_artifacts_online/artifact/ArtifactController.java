@@ -26,6 +26,7 @@ import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
 import edu.tcu.cs.hogwarts_artifacts_online.system.Result;
 import edu.tcu.cs.hogwarts_artifacts_online.system.StatusCode;
 import io.micrometer.core.instrument.MeterRegistry;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 
@@ -39,7 +40,7 @@ public class ArtifactController {
 	private final ArtifactMetrics artifactMetrics;
 
 	public ArtifactController(ArtifactService artifactService, ArtifactToArtifactDtoConverter artifactDtoConverter,
-			ArtifactDtoToArtifactConverter artifactDtoToArtifactConverter,ArtifactMetrics artifactMetrics) {
+			ArtifactDtoToArtifactConverter artifactDtoToArtifactConverter, ArtifactMetrics artifactMetrics) {
 		super();
 		this.artifactService = artifactService;
 		this.artifactDtoConverter = artifactDtoConverter;
@@ -47,6 +48,7 @@ public class ArtifactController {
 		this.artifactMetrics = artifactMetrics;
 	}
 
+	@SecurityRequirement(name = "bearerAuth")
 	@GetMapping("/{artifactId}")
 	@Traced("artifact-controller.findArtifactById")
 	@Logged
@@ -68,48 +70,51 @@ public class ArtifactController {
 		return new Result(true, StatusCode.SUCCESS, "Find All Success", artifactDtoPage);
 	}
 
+	@SecurityRequirement(name = "bearerAuth")
 	@PostMapping
 	@Traced("artifact-controller.addArtifact")
 	@Logged
-	public Result addArtifact(@Valid   @RequestBody ArtifactDto artifactDto) {
+	public Result addArtifact(@Valid @RequestBody ArtifactDto artifactDto) {
 		Artifact newArtifact = this.artifactDtoToArtifactConverter.convert(artifactDto);
 		Artifact savedArtifact = this.artifactService.save(newArtifact);
 		ArtifactDto savedArtifactDto = this.artifactDtoConverter.convert(savedArtifact);
 		artifactMetrics.incrementCreated();
 		return new Result(true, StatusCode.SUCCESS, "Add Success", savedArtifactDto);
 	}
-	
+
+	@SecurityRequirement(name = "bearerAuth")
 	@PutMapping("/{artifactId}")
 	@Traced("artifact-controller.updateArtifact")
 	@Logged
-	public Result updateArtifact( @PathVariable  String artifactId,@Valid @RequestBody ArtifactDto updateArtifactDto) {
-		
-		ArtifactDto updatedArtifactDto=this.artifactService.update(artifactId, updateArtifactDto);
-		return new Result(true,StatusCode.SUCCESS,"Update Success",updatedArtifactDto);		
+	public Result updateArtifact(@PathVariable String artifactId, @Valid @RequestBody ArtifactDto updateArtifactDto) {
+
+		ArtifactDto updatedArtifactDto = this.artifactService.update(artifactId, updateArtifactDto);
+		return new Result(true, StatusCode.SUCCESS, "Update Success", updatedArtifactDto);
 	}
-	
-	
+
+	@SecurityRequirement(name = "bearerAuth")
 	@DeleteMapping("/{artifactId}")
 	@Traced("artifact-controller.deleteArtifact")
 	@Logged
-	public Result deleteArtifact(@PathVariable String artifactId)
-	{  this.artifactService.delete(artifactId);
-	    artifactMetrics.incrementDeleted();
-		return new Result(true,StatusCode.SUCCESS,"Delete Success");
+	public Result deleteArtifact(@PathVariable String artifactId) {
+		this.artifactService.delete(artifactId);
+		artifactMetrics.incrementDeleted();
+		return new Result(true, StatusCode.SUCCESS, "Delete Success");
 	}
-	 
-	
+
+	@SecurityRequirement(name = "bearerAuth")
 	@GetMapping("/summary")
 	@Traced("artifact-controller.summarizeArtifact")
 	@Logged
-    public Result summarizeArtifact() throws Exception {
-		List<Artifact> foundArtifacts=this.artifactService.findAll();
-		
-		List<ArtifactDto> artifactDtos=foundArtifacts.stream().map(found -> this.artifactDtoConverter.convert(found)).collect(Collectors.toList());
-		String artifactSummary=this.artifactService.summarize(artifactDtos);
-	     return new Result(true,StatusCode.SUCCESS,"Summarize Success",artifactSummary);
+	public Result summarizeArtifact() throws Exception {
+		List<Artifact> foundArtifacts = this.artifactService.findAll();
+
+		List<ArtifactDto> artifactDtos = foundArtifacts.stream().map(found -> this.artifactDtoConverter.convert(found))
+				.collect(Collectors.toList());
+		String artifactSummary = this.artifactService.summarize(artifactDtos);
+		return new Result(true, StatusCode.SUCCESS, "Summarize Success", artifactSummary);
 	}
-	
+
 //		Artifact Leaderboard controller we can pass any property later on 
 //		@GetMapping("/leaderboard/{property}")
 //		public Result getLeaderboard(@PathVariable property,@RequestParam(defaultValue="10") int limit)
