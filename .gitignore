@@ -36,4 +36,5 @@ build/
 ### Grafana plugin build outputs ###
 docker/grafana/
 
-.env
+.env-prod
+.env-dev.properties

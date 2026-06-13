@@ -33,7 +33,7 @@ services:
    ports: 
      - "8080:8080"
    env_file:
-     - .env
+     - .env-prod
    environment:
      - SPRING_PROFILES_ACTIVE=prod
    networks:

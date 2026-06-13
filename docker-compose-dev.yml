@@ -1,0 +1,151 @@
+version: '3.8'
+
+networks:
+  collectify-network:
+    driver: bridge
+
+
+
+services:   
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "127.0.0.1:9090:9090"
+    networks:
+     - collectify-network
+    restart: unless-stopped
+    mem_limit: 256m
+
+  grafana:
+    image: grafana/grafana-enterprise
+    container_name: grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - ./docker/grafana:/var/lib/grafana  # Persist dashboards and configs
+    env_file:
+      - ./docker/grafana/grafana-config.env  # Load environment variables (if needed)
+    networks:
+      - collectify-network
+    depends_on:
+      - prometheus
+      - loki
+      - tempo 
+    restart: unless-stopped
+    mem_limit: 256m
+
+  redis:
+    image: redis:7-alpine
+    container_name: redis
+    ports:
+     - "127.0.0.1:6379:6379"
+    networks:
+     - collectify-network
+    restart: unless-stopped
+    mem_limit: 128m
+
+
+  redis-insight:
+    image: redis/redisinsight:latest
+    container_name: redis-insight
+    ports:
+       - "127.0.0.1:5540:5540"
+    depends_on:
+       - redis
+    networks:
+       - collectify-network
+    restart: unless-stopped
+    mem_limit: 128m
+
+  mailpit:
+    image: axllent/mailpit
+    container_name: mailpit
+    ports:
+      - 8025:8025  # Web UI
+      - 1025:1025  # SMTP server
+    networks:
+      - collectify-network
+    restart: unless-stopped
+
+  tempo:
+    image: grafana/tempo:latest
+    container_name: tempo
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./docker/tempo/tempo.yaml:/etc/tempo.yaml
+    networks:
+      - collectify-network
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:3200:3200"   # Tempo UI
+    mem_limit: 128m
+
+  
+  otel-collector:
+     image: otel/opentelemetry-collector-contrib:latest
+     container_name: otel-collector
+     volumes:
+       - ./docker/otel-collector/otel-collector.yaml:/etc/otel-collector.yaml
+     command: [ "--config=/etc/otel-collector.yaml" ]
+     ports:
+      - "127.0.0.1:4317:4317"   # OTLP gRPC receiver
+      - "127.0.0.1:4318:4318"   # OTLP Http receiver
+     depends_on:
+       - tempo
+     networks:
+       - collectify-network
+     restart: unless-stopped
+     mem_limit: 128m
+
+
+  
+  loki:
+     image: grafana/loki:latest
+     container_name: loki
+     user: "0"
+     ports:
+      - "127.0.0.1:3100:3100"
+     volumes:
+      - ./docker/loki/loki.yaml:/etc/loki/local-config.yaml
+      - ./docker/loki/data:/var/loki
+     command: -config.file=/etc/loki/local-config.yaml
+     networks:
+      - collectify-network
+     restart: unless-stopped
+     mem_limit: 128m
+ 
+  zookeeper:
+     image: confluentinc/cp-zookeeper:7.6.0
+     container_name: zookeeper
+     environment:
+       ZOOKEEPER_CLIENT_PORT: 2181
+       ZOOKEEPER_TICK_TIME: 2000
+     ports:
+      - "127.0.0.1:2181:2181"
+     networks:
+      - collectify-network
+     restart: unless-stopped
+     mem_limit: 256m
+
+  kafka:
+     image: confluentinc/cp-kafka:7.6.0
+     container_name: kafka
+     depends_on:
+      - zookeeper
+     ports:
+      - "127.0.0.1:9092:9092"
+     environment:
+       KAFKA_BROKER_ID: 1
+       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+       KAFKA_LISTENERS: INTERNAL://0.0.0.0:29092,EXTERNAL://0.0.0.0:9092
+       KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka:29092,EXTERNAL://localhost:9092
+       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+       KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+     networks:
+      - collectify-network
+     restart: unless-stopped
+     mem_limit: 512m

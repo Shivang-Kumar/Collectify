@@ -3,6 +3,7 @@ package edu.tcu.cs.hogwarts_artifacts_online.security;
 import java.util.Map;
 import java.util.function.Supplier;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authorization.AuthorizationDecision;
 import org.springframework.security.authorization.AuthorizationManager;
 import org.springframework.security.core.Authentication;
@@ -13,12 +14,21 @@ import org.springframework.web.util.UriTemplate;
 
 import edu.tcu.cs.hogwarts_artifacts_online.observability.logging.Logged;
 import edu.tcu.cs.hogwarts_artifacts_online.observability.tracing.Traced;
+import jakarta.annotation.PostConstruct;
 
 @Component
 public class UserRequestAuthorizationManager implements AuthorizationManager<RequestAuthorizationContext>{
 
+	@Value("${api.endpoint.base-url}")
+	private String baseUrl;
+	private UriTemplate USER_URI_TEMPLATE;
 	
-	private static final UriTemplate USER_URI_TEMPLATE=new UriTemplate("/users/{userId}");
+
+	@PostConstruct
+	public void init() {
+	    this.USER_URI_TEMPLATE =
+	            new UriTemplate(baseUrl + "/users/{userId}");
+	}
 	@Override
 	@Traced("UserRequestAuthorizationManager.check")
 	@Logged
@@ -31,9 +41,9 @@ public class UserRequestAuthorizationManager implements AuthorizationManager<Req
 		String jwtUserId=((Jwt) authenticationSupplier.get().getPrincipal()).getClaim("userId").toString();
 		Authentication authentication=authenticationSupplier.get();
 		//Check if user have the role "ROLE_user"
-		boolean hasUserRole=authentication.getAuthorities().stream().anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("Role_user"));
+		boolean hasUserRole=authentication.getAuthorities().stream().anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_user"));
 		//Check if user have the role "ROLE_admin"
-		boolean hasAdminRole=authentication.getAuthorities().stream().anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("Role_admin"));;
+		boolean hasAdminRole=authentication.getAuthorities().stream().anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals("ROLE_admin"));;
 
 		
 		//Compare the two userIds.
