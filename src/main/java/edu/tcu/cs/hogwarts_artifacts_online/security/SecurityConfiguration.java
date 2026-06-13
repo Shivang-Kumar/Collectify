@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -66,16 +67,43 @@ public class SecurityConfiguration {
 
 	@Value("${api.endpoint.base-url}")
 	private String baseUrl;
+	
+	
+	
+	//This security filter chain runs to provide basic authentication for login endpoint
+	@Bean
+	@Order(1)
+	@Traced("SecurityConfiguration.loginSecurityFilterChain")
+	@Logged
+	SecurityFilterChain loginSecurityFilterChain(HttpSecurity http) throws Exception {
 
+	    return http
+	            .securityMatcher( new AntPathRequestMatcher(
+                        this.baseUrl + "/users/login",
+                        "POST"))
+	            .authorizeHttpRequests(auth -> auth
+	                    .anyRequest().authenticated())
+	            .httpBasic(httpBasic -> httpBasic
+	                    .authenticationEntryPoint(
+	                            this.customBasicAuthenticationEntryPoint))
+	            .csrf(csrf -> csrf.disable())
+	            .sessionManagement(session -> session
+	                    .sessionCreationPolicy(
+	                            SessionCreationPolicy.STATELESS))
+	            .build();
+	}
+
+	
+	//This security filter chain handles all other endpoints
 	@Bean
 	@Traced("SecurityConfiguration.securityFilterChain")
 	@Logged
+	@Order(2)
 	SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 		return http
 				.authorizeHttpRequests(authorizeHttpRequest -> authorizeHttpRequest
 						.requestMatchers(HttpMethod.GET, this.baseUrl + "/artifacts/**").permitAll()
 						.requestMatchers(HttpMethod.POST, this.baseUrl + "/users").permitAll()
-						.requestMatchers(HttpMethod.GET, this.baseUrl + "/users/**").hasAuthority("ROLE_admin")// Protecting end point
 						.requestMatchers(HttpMethod.GET, this.baseUrl + "/users/**").access(this.userRequestAuthorizationManager)		  //Authorization rule is defined in userRequestAuthorizationManager																	// this
 						.requestMatchers(HttpMethod.PUT, this.baseUrl + "/users/**").access(this.userRequestAuthorizationManager)
 						.requestMatchers(HttpMethod.DELETE, this.baseUrl + "/users/**").access(this.userRequestAuthorizationManager)
@@ -90,7 +118,6 @@ public class SecurityConfiguration {
 						// All other request is to be authenticated
 						.anyRequest().authenticated())
 				.headers(headers -> headers.frameOptions().disable()).csrf(csrf -> csrf.disable()).cors(Customizer.withDefaults())
-				.httpBasic(httpBasic -> httpBasic.authenticationEntryPoint(this.customBasicAuthenticationEntryPoint))
 				.oauth2ResourceServer(oauth2ResourceServer -> oauth2ResourceServer.jwt().and()
 						.authenticationEntryPoint(customBearerTokenAuthenticationEntryPoint)
 						.accessDeniedHandler(this.customBearerTokenAccessDeniedException))
