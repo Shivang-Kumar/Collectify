@@ -110,7 +110,9 @@ public class SecurityConfiguration {
 						.requestMatchers(
 				                "/v3/api-docs/**",
 				                "/swagger-ui/**",
-				                "/swagger-ui.html"
+				                "/swagger-ui.html",
+				                "/openapi.yaml"
+				                
 				        ).permitAll()
 						.requestMatchers(EndpointRequest.to("health","info","prometheus")).permitAll()
 						.requestMatchers(EndpointRequest.toAnyEndpoint().excluding("health","info")).hasAnyAuthority("ROLE_admin")

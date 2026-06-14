@@ -1,0 +1,840 @@
+openapi: 3.0.0
+info:
+  title: Collectify
+  version: 1.0.0
+  description: |
+  
+     API for the Collectify application
+
+      Authentication Flow
+
+      1. Register a new user using POST /api/v1/users
+      2. Authenticate using POST /api/v1/users/login with HTTP Basic Authentication
+      3. Copy the JWT token returned in the response
+      4. Click the Authorize button in Swagger
+      5. Provide the JWT token using the Bearer scheme
+      6. Access protected endpoints
+
+      Notes
+
+      - Some endpoints are public and require no authentication.
+      - The login endpoint requires HTTP Basic Authentication.
+      - Protected endpoints require a valid JWT Bearer token.
+
+servers:
+  - url: http://localhost:8080
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+    BasicAuth:
+      type: http
+      scheme: basic
+
+  headers:
+    Vary:
+      schema:
+        type: string
+      example: Access-Control-Request-Headers
+    X-Content-Type-Options:
+      schema:
+        type: string
+      example: nosniff
+    X-XSS-Protection:
+      schema:
+        type: integer
+      example: 0
+    Cache-Control:
+      schema:
+        type: string
+      example: no-cache, no-store, max-age=0, must-revalidate
+    Pragma:
+      schema:
+        type: string
+      example: no-cache
+    Expires:
+      schema:
+        type: integer
+      example: 0
+    Transfer-Encoding:
+      schema:
+        type: string
+      example: chunked
+    Keep-Alive:
+      schema:
+        type: string
+      example: timeout=60
+    Connection:
+      schema:
+        type: string
+      example: keep-alive
+
+  responses:
+    UnauthorizedError:
+      description: Unauthorized - Missing or invalid token
+      headers:
+        Vary:
+          $ref: '#/components/headers/Vary'
+        X-Content-Type-Options:
+          $ref: '#/components/headers/X-Content-Type-Options'
+        Cache-Control:
+          $ref: '#/components/headers/Cache-Control'
+        Pragma:
+          $ref: '#/components/headers/Pragma'
+        Expires:
+          $ref: '#/components/headers/Expires'
+        Transfer-Encoding:
+          $ref: '#/components/headers/Transfer-Encoding'
+        Keep-Alive:
+          $ref: '#/components/headers/Keep-Alive'
+        Connection:
+          $ref: '#/components/headers/Connection'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    NotFoundError:
+      description: Resource not found
+      headers:
+        Vary:
+          $ref: '#/components/headers/Vary'
+        X-Content-Type-Options:
+          $ref: '#/components/headers/X-Content-Type-Options'
+        Cache-Control:
+          $ref: '#/components/headers/Cache-Control'
+        Pragma:
+          $ref: '#/components/headers/Pragma'
+        Expires:
+          $ref: '#/components/headers/Expires'
+        Transfer-Encoding:
+          $ref: '#/components/headers/Transfer-Encoding'
+        Keep-Alive:
+          $ref: '#/components/headers/Keep-Alive'
+        Connection:
+          $ref: '#/components/headers/Connection'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+    BadRequestError:
+      description: Invalid request body or parameters
+      headers:
+        Vary:
+          $ref: '#/components/headers/Vary'
+        X-Content-Type-Options:
+          $ref: '#/components/headers/X-Content-Type-Options'
+        Cache-Control:
+          $ref: '#/components/headers/Cache-Control'
+        Pragma:
+          $ref: '#/components/headers/Pragma'
+        Expires:
+          $ref: '#/components/headers/Expires'
+        Transfer-Encoding:
+          $ref: '#/components/headers/Transfer-Encoding'
+        Connection:
+          $ref: '#/components/headers/Connection'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        flag:
+          type: boolean
+          example: false
+        code:
+          type: integer
+          example: 401
+        message:
+          type: string
+          example: Unauthorized
+        data:
+          type: string
+          example: Full authentication is required to access this resource
+
+    UserRequest:
+      type: object
+      required:
+        - username
+        - password
+      properties:
+        username:
+          type: string
+          example: john@gmail.com
+        password:
+          type: string
+          example: "MyPass@1"
+        enabled:
+          type: boolean
+          example: true
+        roles:
+          type: string
+          example: user
+
+    UserUpdateRequest:
+      type: object
+      properties:
+        username:
+          type: string
+          example: John-update
+        enabled:
+          type: boolean
+          example: true
+        roles:
+          type: string
+          example: admin user
+
+    UserResponse:
+      type: object
+      properties:
+        flag:
+          type: boolean
+          example: true
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Find All Users Success
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 1
+              username:
+                type: string
+                example: john@gmail.com
+              enabled:
+                type: boolean
+                example: true
+              roles:
+                type: string
+                example: user
+
+    ArtifactRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: Rembrall
+        description:
+          type: string
+          example: This is a description of the artifact.
+        imageUrl:
+          type: string
+          example: https://example.com/image.png
+
+    ArtifactResponse:
+      type: object
+      properties:
+        flag:
+          type: boolean
+          example: true
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Find All Artifacts Success
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 51232456489892569
+              name:
+                type: string
+                example: Rembrall
+              description:
+                type: string
+                example: This is a description of the artifact.
+              imageUrl:
+                type: string
+                example: https://example.com/image.png
+
+    OwnerRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          example: Grifenfor Holsmith
+
+    OwnerResponse:
+      type: object
+      properties:
+        flag:
+          type: boolean
+          example: true
+        code:
+          type: integer
+          example: 200
+        message:
+          type: string
+          example: Find All Owners Success
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+                example: 1
+              name:
+                type: string
+                example: Grifenfor Holsmith
+
+paths:
+
+  # ─── User API ───────────────────────────────────────────────────────────────
+
+  /api/v1/users:
+    get:
+      tags:
+        - User API
+      summary: Find All Users
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Find All Users - Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+    post:
+      tags:
+        - User API
+      summary: Add a User
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRequest'
+      responses:
+        '201':
+          description: Add User - Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flag:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 201
+                  message:
+                    type: string
+                    example: Add User Success
+                  data:
+                    $ref: '#/components/schemas/UserRequest'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/v1/users/{id}:
+    get:
+      tags:
+        - User API
+      summary: Find User By ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Find User By ID - Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flag:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Find User By ID Success
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      username:
+                        type: string
+                        example: john@gmail.com
+                      enabled:
+                        type: boolean
+                        example: true
+                      roles:
+                        type: string
+                        example: user
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    put:
+      tags:
+        - User API
+      summary: Update a User
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateRequest'
+      responses:
+        '200':
+          description: Update User - Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flag:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Update User Success
+                  data:
+                    $ref: '#/components/schemas/UserUpdateRequest'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+    delete:
+      tags:
+        - User API
+      summary: Delete User By ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 1
+      responses:
+        '200':
+          description: Delete User - Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flag:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Delete User Success
+                  data:
+                    type: string
+                    nullable: true
+                    example: null
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/v1/users/login:
+    post:
+      tags:
+        - User API
+      summary: Login
+      description: >
+        Authenticates using HTTP Basic Auth (username + password in the
+        Authorization header). Returns a JWT Bearer token on success.
+      security:
+        - BasicAuth: []
+      responses:
+        '200':
+          description: Login - Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flag:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Login Success
+                  data:
+                    type: string
+                    description: JWT Bearer token
+                    example: eyJhbGciOiJSUzI1NiJ9...
+        '401':
+          description: Login - Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                flag: false
+                code: 401
+                message: Log in credentials are missing
+                data: Full authentication is required to access this resource
+
+  # ─── Artifact API ────────────────────────────────────────────────────────────
+
+  /api/v1/artifacts:
+    get:
+      tags:
+        - Artifact
+      summary: Find All Artifacts
+      responses:
+        '200':
+          description: Find All Artifacts - Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ArtifactResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+    post:
+      tags:
+        - Artifact
+      summary: Add an Artifact
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArtifactRequest'
+      responses:
+        '201':
+          description: Add Artifact - Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flag:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 201
+                  message:
+                    type: string
+                    example: Add Artifact Success
+                  data:
+                    $ref: '#/components/schemas/ArtifactRequest'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/v1/artifacts/{id}:
+    get:
+      tags:
+        - Artifact
+      summary: Find an Artifact by ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 51232456489892569
+      responses:
+        '200':
+          description: Find Artifact by ID - Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flag:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Find Artifact By ID Success
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 51232456489892569
+                      name:
+                        type: string
+                        example: Rembrall
+                      description:
+                        type: string
+                        example: This is a description of the artifact.
+                      imageUrl:
+                        type: string
+                        example: https://example.com/image.png
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    put:
+      tags:
+        - Artifact
+      summary: Update an Artifact
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 21232456489892566
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ArtifactRequest'
+      responses:
+        '200':
+          description: Update Artifact - Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flag:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Update Artifact Success
+                  data:
+                    $ref: '#/components/schemas/ArtifactRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    delete:
+      tags:
+        - Artifact
+      summary: Delete an Artifact
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          example: 21232456489892566
+      responses:
+        '200':
+          description: Delete Artifact - Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flag:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Delete Artifact Success
+                  data:
+                    type: string
+                    nullable: true
+                    example: null
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/v1/artifacts/summary:
+    get:
+      tags:
+        - Artifact
+      summary: Summarize Artifacts
+      description: Returns a summary of all artifacts in the system.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Summarize Artifacts - Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flag:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Summarize Success
+                  data:
+                    type: object
+                    description: Summary data (structure to be confirmed)
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  # ─── Owner API ───────────────────────────────────────────────────────────────
+
+  /api/v1/owners:
+    get:
+      tags:
+        - Owner
+      summary: Find All Owners
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Find All Owners - Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OwnerResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+    post:
+      tags:
+        - Owner
+      summary: Add an Owner
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OwnerRequest'
+      responses:
+        '201':
+          description: Add Owner - Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flag:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 201
+                  message:
+                    type: string
+                    example: Add Owner Success
+                  data:
+                    $ref: '#/components/schemas/OwnerRequest'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/v1/owners/leaderboard/artifacts:
+    get:
+      tags:
+        - Owner
+      summary: Artifact Leaderboard by Owner
+      description: Returns a leaderboard ranking owners by number of artifacts.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Leaderboard - Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  flag:
+                    type: boolean
+                    example: true
+                  code:
+                    type: integer
+                    example: 200
+                  message:
+                    type: string
+                    example: Leaderboard Success
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        ownerName:
+                          type: string
+                          example: Grifenfor Holsmith
+                        artifactCount:
+                          type: integer
+                          example: 5
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
