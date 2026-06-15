@@ -55,6 +55,7 @@ public class UserService implements UserDetailsService {
 	@Traced("user-service.addUser")
 	@Logged
 	public User addUser(User user) {
+		this.userRepository.findByUsername(user.getUsername()).ifPresent((existingUser)-> {throw new RuntimeException("Username already exits, please try a different username");});
 		user.setPassword(this.passwordEncoder.encode(user.getPassword()));
 		User savedUser=this.userRepository.save(user);
 		Notification notify=createNotification(user);
