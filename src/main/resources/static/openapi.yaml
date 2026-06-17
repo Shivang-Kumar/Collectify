@@ -530,6 +530,40 @@ paths:
                 message: Log in credentials are missing
                 data: Full authentication is required to access this resource
 
+  /api/v1/users/logout:
+      post:
+        tags:
+         - User API
+        summary: Logout
+        description: >
+           Logs out the currently authenticated user by removing the JWT token
+           from the Redis whitelist. The JWT must be provided in the
+           Authorization header as a Bearer token.
+        security:
+          - BearerAuth: []
+        responses:
+            '200':
+               description: Logout - Success
+               content:
+                 application/json:
+                   schema:
+                     type: object
+                     properties:
+                          flag:
+                             type: boolean
+                             example: true
+                          code:
+                             type: integer
+                             example: 200
+                          message:
+                             type: string
+                             example: Logout is successful
+                          data:
+                             type: boolean
+                             example: true
+            '401':
+                $ref: '#/components/responses/UnauthorizedError'
+
   # ─── Artifact API ────────────────────────────────────────────────────────────
 
   /api/v1/artifacts:

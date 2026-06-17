@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -31,7 +32,7 @@ public class AuthController {
 
 
 	
-	@SecurityRequirement(name = "basicAuth")
+	@SecurityRequirement(name = "basicAuth")  //For Swagger OPENAPI Documentation
 	@PostMapping("/login")
 	@Traced("authController.getLoginInfo")
 	@Logged
@@ -39,5 +40,14 @@ public class AuthController {
 		LOGGER.debug("Authenticated User: '{}'",authentication.getName());
 		System.out.println(authentication);
 		return new Result(true,StatusCode.SUCCESS,"User info and Json web token",this.authService.createLoginInfo(authentication));
+	}
+	
+	
+	@PostMapping("/logout")
+	@Traced("authController.performLogout")
+	@Logged
+	public Result performLogout(Authentication authentication) {
+		boolean result=this.authService.performLogout(authentication);
+		return new Result(true,StatusCode.SUCCESS,"Logout is successfull",result);
 	}
 }
