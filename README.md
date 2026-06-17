@@ -357,6 +357,3 @@ Key settings configurable via Spring profiles (`dev` / `prod`):
 
 ---
 
-## License
-
-This project is open source. See [LICENSE](LICENSE) for details.
