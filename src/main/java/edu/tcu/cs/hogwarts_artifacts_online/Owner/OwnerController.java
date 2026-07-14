@@ -96,7 +96,7 @@ public class OwnerController {
 		return new Result(true, StatusCode.SUCCESS, "Artifact Assignment Success");
 	}
 
-	@GetMapping("/leaderboard/owner")
+	@GetMapping("/leaderboard")
 	@Traced("owner-controller.getLeaderboard")
 	@Logged
 	public Result getLeaderboard(@RequestParam(defaultValue = "10") int limit) {
@@ -105,7 +105,7 @@ public class OwnerController {
 
 	}
 
-	@GetMapping("/leaderboard/owners/{ownerId}")
+	@GetMapping("/leaderboard/{ownerId}")
 	@Traced("owner-controller.getLeaderboard-for-owner-rank")
 	@Logged
 	public Result getLeaderboard(@PathVariable String ownerId) {
