@@ -828,23 +828,161 @@ paths:
                     example: 201
                   message:
                     type: string
-                    example: Add Owner Success
+                    example: Add Success
                   data:
                     $ref: '#/components/schemas/OwnerRequest'
+        '400':
+          $ref: '#/components/responses/BadRequestError'
         '401':
           $ref: '#/components/responses/UnauthorizedError'
 
-  /api/v1/owners/leaderboard/artifacts:
+  /api/v1/owners/{ownerId}:
     get:
       tags:
         - Owner
-      summary: Artifact Leaderboard by Owner
-      description: Returns a leaderboard ranking owners by number of artifacts.
+      summary: Find Owner By ID
       security:
         - BearerAuth: []
+      parameters:
+        - name: ownerId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
       responses:
         '200':
-          description: Leaderboard - Success
+          description: Find Owner By ID - Success
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    put:
+      tags:
+        - Owner
+      summary: Update Owner
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: ownerId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OwnerRequest'
+      responses:
+        '200':
+          description: Update Owner - Success
+        '400':
+          $ref: '#/components/responses/BadRequestError'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+    delete:
+      tags:
+        - Owner
+      summary: Delete Owner
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: ownerId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Delete Owner - Success
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/v1/owners/{ownerId}/artifacts/{artifactId}:
+    put:
+      tags:
+        - Owner
+      summary: Assign Artifact To Owner
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: ownerId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+
+        - name: artifactId
+          in: path
+          required: true
+          schema:
+            type: string
+            example: "51232456489892569"
+
+      responses:
+        '200':
+          description: Artifact Assignment Success
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
+
+  /api/v1/owners/leaderboard:
+    get:
+      tags:
+        - Owner
+      summary: Owner Leaderboard
+      description: Returns owners ranked by number of artifacts.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            default: 10
+            example: 10
+
+      responses:
+        '200':
+          description: Owner Leaderboard - Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OwnerResponse'
+        '401':
+          $ref: '#/components/responses/UnauthorizedError'
+
+  /api/v1/owners/leaderboard/{ownerId}:
+    get:
+      tags:
+        - Owner
+      summary: Get Owner Rank
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: ownerId
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+
+      responses:
+        '200':
+          description: Owner Rank - Success
           content:
             application/json:
               schema:
@@ -858,17 +996,11 @@ paths:
                     example: 200
                   message:
                     type: string
-                    example: Leaderboard Success
+                    example: Owners Leaderboard
                   data:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        ownerName:
-                          type: string
-                          example: Grifenfor Holsmith
-                        artifactCount:
-                          type: integer
-                          example: 5
+                    type: integer
+                    example: 2
         '401':
           $ref: '#/components/responses/UnauthorizedError'
+        '404':
+          $ref: '#/components/responses/NotFoundError'
