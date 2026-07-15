@@ -103,6 +103,10 @@ public class SecurityConfiguration {
 		return http
 				.authorizeHttpRequests(authorizeHttpRequest -> authorizeHttpRequest
 						.requestMatchers(HttpMethod.GET, this.baseUrl + "/artifacts/**").permitAll()
+						.requestMatchers(
+							    "/mcp/**",
+							    "/sse/**"
+							).permitAll()
 						.requestMatchers(HttpMethod.POST, this.baseUrl + "/users").permitAll()
 						.requestMatchers(HttpMethod.GET, this.baseUrl + "/users/**").access(this.userRequestAuthorizationManager)		  //Authorization rule is defined in userRequestAuthorizationManager																	// this
 						.requestMatchers(HttpMethod.PUT, this.baseUrl + "/users/**").access(this.userRequestAuthorizationManager)
