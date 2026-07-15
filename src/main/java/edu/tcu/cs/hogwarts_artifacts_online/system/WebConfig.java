@@ -21,6 +21,9 @@ public class WebConfig implements WebMvcConfigurer {
 
 	@Override
 	public void addInterceptors(InterceptorRegistry registry) {
-		registry.addInterceptor(this.jwtInterceptor).addPathPatterns("/**");
+		registry.addInterceptor(this.jwtInterceptor).addPathPatterns("/**").excludePathPatterns(
+                "/mcp/**",  // Bypass MCP HTTP endpoint
+                "/sse/**"   // Bypass SSE stream endpoint
+            );;
 	}
 }
